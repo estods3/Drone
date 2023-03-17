@@ -16,3 +16,12 @@ Drone projects including PCB design, Frame, and Software
 
 
 ### ROS
+from PC run:
+
+roscore
+
+in another terminal from PC run:
+
+roslaunch rosserial_server socket.launch
+
+This will create a rosserial server to interface with the nodeMCU controller.
