@@ -23,10 +23,11 @@
 //int pwm_motor_RR =
 //int i2c_sda =
 //int i2c_scl =
-//int gpio_led_heartbeat =
-int gpio_led_wifi_connected = 13;  // GPIO13
-//int gpio_led_wifi_datarx =
+int gpio_led_heartbeat = D5;
+int gpio_led_wifi_connected = D7;  // GPIO13
+int gpio_led_wifi_datarx = D6;
 //int gpio_led_accel_status =
+//int gpio_battery_status = 
 
 // WIFI Connection
 //----------------
@@ -44,17 +45,18 @@ IPAddress ros_socket_server(192,168,1,200);
 // Set the rosserial socket server port (default is 11411)
 const uint16_t ros_socket_serverPort = 11411;
 
-ros::NodeHandle nh;
+ros::NodeHandle drone_rosnode_handle;
 // Make a chatter publisher
 std_msgs::String str_msg;
 ros::Publisher chatter("Command", &str_msg);
 char hold[5] = "Hold";
 char gui_command[5] = "Hold";
 
+// Connect to Wifi
+// Description: initialize connection to specified wifi network
 void connect_to_wifi(){
   Serial.print("Connecting to WiFi: ");
   Serial.println(ssid);
-  Serial.println(password);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -66,9 +68,13 @@ void connect_to_wifi(){
   Serial.println(WiFi.localIP());
   digitalWrite(gpio_led_wifi_connected, HIGH);
 }
+
 void update_heartbeat_led(){
   
 }
+
+// Initialize GUI Server
+// Description: Create a GUI server with an http webpage for User to enter commands
 void initialize_gui_server(){
   gui_server.begin();
   Serial.println("GUI Server started");
@@ -81,27 +87,39 @@ void initialize_gui_server(){
 void get_commands_from_gui_client(){
 
 }
+
 void read_imu_data(){
   
 }
 
 // Initialize ROS Serial Socket Server Connection
 // Description: Initialize a connection to a ROS Socket Server running on a different machine.
-void initialize_ros_serial_socket_server_connection(){
-  nh.getHardware()->setConnection(ros_socket_server, ros_socket_serverPort);
+void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t port){
+  drone_rosnode_handle.getHardware()->setConnection(server, port);
   Serial.println("Connected to ROS socket server");
-  nh.initNode();
+  drone_rosnode_handle.initNode();
   Serial.print("IP = ");
-  Serial.println(nh.getHardware()->getLocalIP());
+  Serial.println(drone_rosnode_handle.getHardware()->getLocalIP());
 }
+
 void transmit_ros_topic(){
   
 }
+
+/* SETUP
+*
+*
+*/
 void setup()
 {
   // Initialize serial debug interface
   Serial.begin(115200);
   Serial.println();
+
+  // Initializing Pins
+  pinMode(gpio_led_heartbeat, OUTPUT);  
+  pinMode(gpio_led_wifi_connected, OUTPUT);
+  pinMode(gpio_led_wifi_datarx, OUTPUT);
 
   // Connect the ESP8266 the the wifi AP
   connect_to_wifi();
@@ -111,16 +129,20 @@ void setup()
 
   // Initialize ROS Serial Socket Server Connection
   // Set the connection to rosserial socket server
-  initialize_ros_serial_socket_server_connection();
+  initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
 
-  // Start to be polite
-  nh.advertise(chatter);
+  // Initiate ROS Messages
+  drone_rosnode_handle.advertise(chatter);
 }
 
+/* Main Loop
+*
+*
+*/
 void loop()
 {
 
-  if (nh.connected()) {
+  if (drone_rosnode_handle.connected()) {
     //Serial.println("Connected");
     // Say hello
     str_msg.data = gui_command;
@@ -129,7 +151,7 @@ void loop()
   //} else {
   //  Serial.println("Not Connected");
   //}
-  nh.spinOnce();
+  drone_rosnode_handle.spinOnce();
 
   // Check if a client has connected
   WiFiClient gui_client = gui_server.available();
@@ -168,6 +190,9 @@ void loop()
     char gui_command[9] = "BACKWARD";
   }
   //TODO - if any command recieved, digital write wifi rx pin
+  digitalWrite(gpio_led_wifi_datarx, HIGH);
+  delay(100);
+  digitalWrite(gpio_led_wifi_datarx, LOW);  
 
   // Return the response
   gui_client.println("HTTP/1.1 200 OK");
@@ -193,7 +218,7 @@ void loop()
   Serial.println("");
 
   // Loop exproximativly at 1Hz
+  digitalWrite(gpio_led_heartbeat, HIGH);
   delay(1000);
-
-  
+  digitalWrite(gpio_led_heartbeat, LOW);  
 }
