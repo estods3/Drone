@@ -38,3 +38,11 @@ roslaunch rosserial_server socket.launch port:=/dev/ttyUSB0
 ```
 
 This will create a rosserial server to interface with the nodeMCU controller.
+
+## User Interface
+
+Commands available:
+
+Up, Down, Left, Right, Forward, Backward, Rotate Left, Rotate Right
+
+If not command is given, the drone will hold in place.
