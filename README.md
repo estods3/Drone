@@ -11,7 +11,9 @@ drone physical size
 
 
 ## PCB
+single-board design with accelerometers, motor speed controllers, battery management, and LEDs.
 
+NodeMCU socket for controller with integrated wifi.
 
 
 ## Frame
@@ -20,7 +22,7 @@ drone physical size
 
 
 ## Software
-
+Arduino-based C++ program with ROS/serial interface. Wifi controlled.
 
 ### ROS
 from PC run:
