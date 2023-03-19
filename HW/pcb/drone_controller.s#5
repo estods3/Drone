@@ -9203,7 +9203,7 @@ Battery/VCC source
 
 Peripherals:
 Accelerometer (I2C?)
-Altimiter/RangeFinder
+Barometer/Pressure Sensor
 Wireless Connection Interface (Wifi, BT)
 Motor Drivers (ESCs)
 Flight Controller?</text>
@@ -9222,6 +9222,7 @@ MCU Heartbeat (1 second)
 Wifi Connection (2 LEDs, While Conn Established, On Rx)
 Accelerometer Update (0.5 second)</text>
 <text x="-38.1" y="30.48" size="1.778" layer="91" grouprefs="ESP8266">Operating Voltage: 5V
+PWM Pins: D2 is I2C and PWM. need to use SPI instead?
 Powers ICM-20600 Accelerometer off of 3V3 Power</text>
 <text x="-127" y="114.3" size="0.6096" layer="91" grouprefs="3.7VCONNECTOR">Include Battery Charging Circuitry?
 Include Battery Indicator Circuitry

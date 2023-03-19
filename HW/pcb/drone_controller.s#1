@@ -9403,7 +9403,7 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 <instance part="LED7" gate="G$1" x="83.82" y="-17.78" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
 <attribute name="VALUE" x="88.392" y="-12.065" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="SUPPLY13" gate="GND" x="-78.74" y="12.7" smashed="yes">
+<instance part="SUPPLY13" gate="GND" x="-78.74" y="12.7" smashed="yes" grouprefs="ESP8266">
 <attribute name="VALUE" x="-80.645" y="9.525" size="1.778" layer="96"/>
 </instance>
 </instances>
@@ -9533,7 +9533,7 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 </segment>
 <segment>
 <pinref part="A1" gate="G$1" pin="RST"/>
-<wire x1="-71.12" y1="15.24" x2="-78.74" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="-71.12" y1="15.24" x2="-78.74" y2="15.24" width="0.1524" layer="91" grouprefs="ESP8266"/>
 <pinref part="SUPPLY13" gate="GND" pin="GND"/>
 </segment>
 </net>
@@ -9669,8 +9669,8 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 </segment>
 <segment>
 <pinref part="A1" gate="G$1" pin="EN"/>
-<wire x1="-71.12" y1="17.78" x2="-78.74" y2="17.78" width="0.1524" layer="91"/>
-<label x="-78.74" y="17.78" size="1.778" layer="95"/>
+<wire x1="-71.12" y1="17.78" x2="-78.74" y2="17.78" width="0.1524" layer="91" grouprefs="ESP8266"/>
+<label x="-78.74" y="17.78" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -9721,9 +9721,9 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 <label x="43.18" y="88.9" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
-<pinref part="A1" gate="G$2" pin="D2"/>
-<wire x1="-17.78" y1="7.62" x2="-22.86" y2="7.62" width="0.1524" layer="91" grouprefs="ESP8266"/>
-<label x="-22.86" y="7.62" size="1.778" layer="95" grouprefs="ESP8266"/>
+<pinref part="A1" gate="G$2" pin="D4"/>
+<wire x1="-22.86" y1="2.54" x2="-17.78" y2="2.54" width="0.1524" layer="91" grouprefs="ESP8266"/>
+<label x="-22.86" y="2.54" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 </net>
 <net name="AD0" class="0">
@@ -9759,14 +9759,14 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 </net>
 <net name="ESC_RLM" class="0">
 <segment>
-<pinref part="A1" gate="G$2" pin="D7"/>
-<wire x1="17.78" y1="7.62" x2="22.86" y2="7.62" width="0.1524" layer="91" grouprefs="ESP8266"/>
-<label x="17.78" y="7.62" size="1.778" layer="95" grouprefs="ESP8266"/>
-</segment>
-<segment>
 <pinref part="JP7" gate="A" pin="2"/>
 <wire x1="167.64" y1="50.8" x2="142.24" y2="50.8" width="0.1524" layer="91" grouprefs="MOTORS"/>
 <label x="142.24" y="50.8" size="1.778" layer="95" grouprefs="MOTORS"/>
+</segment>
+<segment>
+<pinref part="A1" gate="G$2" pin="D2"/>
+<wire x1="-25.4" y1="7.62" x2="-17.78" y2="7.62" width="0.1524" layer="91" grouprefs="ESP8266"/>
+<label x="-25.4" y="7.62" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 </net>
 <net name="ESC_RRM" class="0">

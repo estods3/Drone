@@ -27,7 +27,7 @@ int gpio_led_heartbeat = D5;
 int gpio_led_wifi_connected = D7;  // GPIO13
 int gpio_led_wifi_datarx = D6;
 //int gpio_led_accel_status =
-//int gpio_battery_status = 
+//int gpio_battery_low_status = 
 
 // WIFI Connection
 //----------------
@@ -50,7 +50,7 @@ ros::NodeHandle drone_rosnode_handle;
 std_msgs::String str_msg;
 ros::Publisher chatter("Command", &str_msg);
 char hold[5] = "Hold";
-char gui_command[5] = "Hold";
+char gui_command[5] = "Hold"; //default command
 
 // Connect to Wifi
 // Description: initialize connection to specified wifi network
@@ -66,11 +66,19 @@ void connect_to_wifi(){
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  digitalWrite(gpio_led_wifi_connected, HIGH);
+  check_wifi_status();
 }
 
-void update_heartbeat_led(){
-  
+// Check Wifi Status
+// Description: Check Wifi status, update Wifi LED accordingly.
+bool check_wifi_status(){
+  bool wifistatus = WiFi.status() == WL_CONNECTED
+  if(wifistatus){
+    digitalWrite(gpio_led_wifi_connected, HIGH);
+  } else {
+    digitalWrite(gpio_led_wifi_connected, HIGH);    
+  }
+  return wifistatus
 }
 
 // Initialize GUI Server
@@ -105,6 +113,56 @@ void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t p
 void transmit_ros_topic(){
   
 }
+
+
+class heartbeatLED
+{
+	// Class Member Variables
+	// These are initialized at startup
+	int ledPin;      // the number of the LED pin
+	long OnTime;     // milliseconds of on-time
+	long OffTime;    // milliseconds of off-time
+
+	// These maintain the current state
+	int ledState;             		// ledState used to set the LED
+	unsigned long previousMillis;  	// will store last time LED was updated
+
+  // Constructor - creates a heartbeatLED
+  // and initializes the member variables and state
+  public:
+  heartbeatLED(int pin, long on, long off)
+  {
+	ledPin = pin;
+	pinMode(ledPin, OUTPUT);     
+	  
+	OnTime = on;
+	OffTime = off;
+	
+	ledState = LOW; 
+	previousMillis = 0;
+  }
+
+  void Update()
+  {
+    // check to see if it's time to change the state of the LED
+    unsigned long currentMillis = millis();
+     
+    if((ledState == HIGH) && (currentMillis - previousMillis >= OnTime))
+    {
+    	ledState = LOW;  // Turn it off
+      previousMillis = currentMillis;  // Remember the time
+      digitalWrite(ledPin, ledState);  // Update the actual LED
+    }
+    else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime))
+    {
+      ledState = HIGH;  // turn it on
+      previousMillis = currentMillis;   // Remember the time
+      digitalWrite(ledPin, ledState);	  // Update the actual LED
+    }
+  }
+};
+
+heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
 
 /* SETUP
 *
@@ -141,7 +199,12 @@ void setup()
 */
 void loop()
 {
-
+  // Every Loop Check:
+  heartbeat.Update();
+  check_wifi_status();
+  //batterylife();
+  //accelerometer();
+  
   if (drone_rosnode_handle.connected()) {
     //Serial.println("Connected");
     // Say hello
@@ -189,7 +252,7 @@ void loop()
   if (request.indexOf("/CMD=BACKWARD") != -1)  {
     char gui_command[9] = "BACKWARD";
   }
-  //TODO - if any command recieved, digital write wifi rx pin
+  // if any command recieved, digital write wifi rx pin
   digitalWrite(gpio_led_wifi_datarx, HIGH);
   delay(100);
   digitalWrite(gpio_led_wifi_datarx, LOW);  
@@ -217,8 +280,6 @@ void loop()
   Serial.println("GUI Client disconnected");
   Serial.println("");
 
-  // Loop exproximativly at 1Hz
-  digitalWrite(gpio_led_heartbeat, HIGH);
+  // Loop at 1Hz
   delay(1000);
-  digitalWrite(gpio_led_heartbeat, LOW);  
 }

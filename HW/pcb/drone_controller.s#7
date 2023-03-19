@@ -9197,12 +9197,15 @@ W = angled&lt;p&gt;
 <sheets>
 <sheet>
 <plain>
-<text x="-129.54" y="55.88" size="1.778" layer="91">Parts Needed:
-Accelerometer (I2C?)
+<text x="-129.54" y="45.72" size="1.778" layer="91">Parts Needed:
 MCU
-Wireless Connection Interface (Wifi, BT)
-Motor Drivers
 Battery/VCC source
+
+Peripherals:
+Accelerometer (I2C?)
+Altimiter/RangeFinder
+Wireless Connection Interface (Wifi, BT)
+Motor Drivers (ESCs)
 Flight Controller?</text>
 <text x="139.7" y="119.38" size="1.778" layer="91" grouprefs="MOTORS">1S or 2S-3S LiPo battery packs?
 motor drivers needed?
@@ -9220,9 +9223,12 @@ Wifi Connection (2 LEDs, While Conn Established, On Rx)
 Accelerometer Update (0.5 second)</text>
 <text x="-38.1" y="30.48" size="1.778" layer="91" grouprefs="ESP8266">Operating Voltage: 5V
 Powers ICM-20600 Accelerometer off of 3V3 Power</text>
-<text x="-127" y="114.3" size="1.778" layer="91" grouprefs="3.7VCONNECTOR">Include Battery Charging Circuitry?
+<text x="-127" y="114.3" size="0.6096" layer="91" grouprefs="3.7VCONNECTOR">Include Battery Charging Circuitry?
 Include Battery Indicator Circuitry
-Include Boost Converter Circuitry</text>
+Include Boost Converter Circuitry
+
+https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booster/
+#:~:text=Nodemcu%20operates%20at%205v%20%26%203.3V.</text>
 </plain>
 <instances>
 <instance part="R4" gate="G$1" x="129.54" y="-10.16" smashed="yes" grouprefs="USER_INTERFACE">

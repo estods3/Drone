@@ -9213,7 +9213,7 @@ Host interface: 10 MHz SPI or 400 kHz Fast Mode I2C
 ..do we need faster update rate?
 Source: https://invensense.tdk.com/wp-content/uploads/
 2021/05/DS-000184-ICM-20600-v1.1.pdf</text>
-<text x="86.36" y="0" size="1.778" layer="91" grouprefs="USER_INTERFACE">LEDs:
+<text x="106.68" y="2.54" size="1.778" layer="91" grouprefs="USER_INTERFACE">LEDs:
 Battery Status (3 LEDs Low,Med,High)
 MCU Heartbeat (1 second)
 Wifi Connection (2 LEDs, While Conn Established, On Rx)
@@ -9273,17 +9273,17 @@ Include Boost Converter Circuitry</text>
 <instance part="SUPPLY1" gate="GND" x="-73.66" y="109.22" smashed="yes" grouprefs="ARDUINO">
 <attribute name="VALUE" x="-75.565" y="106.045" size="1.778" layer="96"/>
 </instance>
-<instance part="LED1" gate="G$1" x="63.5" y="-12.7" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="68.072" y="-6.985" size="1.778" layer="96" rot="R180"/>
+<instance part="LED1" gate="G$1" x="83.82" y="-12.7" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="-6.985" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="LED2" gate="G$1" x="63.5" y="-7.62" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="68.072" y="-1.905" size="1.778" layer="96" rot="R180"/>
+<instance part="LED2" gate="G$1" x="83.82" y="-7.62" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="-1.905" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="LED3" gate="G$1" x="63.5" y="-2.54" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="68.072" y="3.175" size="1.778" layer="96" rot="R180"/>
+<instance part="LED3" gate="G$1" x="83.82" y="-2.54" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="3.175" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="SUPPLY2" gate="GND" x="172.72" y="-15.24" smashed="yes" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="170.815" y="-18.415" size="1.778" layer="96"/>
+<instance part="SUPPLY2" gate="GND" x="101.6" y="-12.7" smashed="yes" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="99.695" y="-15.875" size="1.778" layer="96"/>
 </instance>
 <instance part="SV1" gate="G$1" x="-106.68" y="-7.62" smashed="yes" rot="R180" grouprefs="DEBUG_INTERFACE">
 <attribute name="VALUE" x="-105.41" y="2.54" size="1.778" layer="96" rot="R180"/>
@@ -9328,11 +9328,11 @@ Include Boost Converter Circuitry</text>
 <attribute name="NAME" x="-12.7" y="21.59" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-12.7" y="-8.89" size="1.778" layer="96" rot="MR180"/>
 </instance>
-<instance part="LED4" gate="G$1" x="63.5" y="7.62" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="68.072" y="13.335" size="1.778" layer="96" rot="R180"/>
+<instance part="LED4" gate="G$1" x="83.82" y="7.62" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="13.335" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="LED5" gate="G$1" x="63.5" y="2.54" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="68.072" y="8.255" size="1.778" layer="96" rot="R180"/>
+<instance part="LED5" gate="G$1" x="83.82" y="2.54" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="8.255" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="SUPPLY4" gate="GND" x="-33.02" y="-15.24" smashed="yes" grouprefs="ESP8266">
 <attribute name="VALUE" x="-34.925" y="-18.415" size="1.778" layer="96"/>
@@ -9389,11 +9389,11 @@ Include Boost Converter Circuitry</text>
 <instance part="P+5" gate="VCC" x="142.24" y="38.1" smashed="yes" grouprefs="MOTORS">
 <attribute name="VALUE" x="142.24" y="38.1" size="1.778" layer="96"/>
 </instance>
-<instance part="LED6" gate="G$1" x="63.5" y="12.7" smashed="yes" rot="R90">
-<attribute name="VALUE" x="68.072" y="18.415" size="1.778" layer="96" rot="R180"/>
+<instance part="LED6" gate="G$1" x="83.82" y="12.7" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="18.415" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="LED7" gate="G$1" x="63.5" y="-17.78" smashed="yes" rot="R90">
-<attribute name="VALUE" x="68.072" y="-12.065" size="1.778" layer="96" rot="R180"/>
+<instance part="LED7" gate="G$1" x="83.82" y="-17.78" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="88.392" y="-12.065" size="1.778" layer="96" rot="R180"/>
 </instance>
 </instances>
 <busses>
@@ -9648,8 +9648,8 @@ Include Boost Converter Circuitry</text>
 <wire x1="40.64" y1="86.36" x2="40.64" y2="106.68" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <wire x1="40.64" y1="106.68" x2="119.38" y2="106.68" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <pinref part="U1" gate="G$1" pin="VDDIO"/>
-<wire x1="78.74" y1="101.6" x2="119.38" y2="101.6" width="0.1524" layer="91"/>
-<junction x="119.38" y="101.6"/>
+<wire x1="78.74" y1="101.6" x2="119.38" y2="101.6" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<junction x="119.38" y="101.6" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="N$1" class="0">

@@ -9197,12 +9197,15 @@ W = angled&lt;p&gt;
 <sheets>
 <sheet>
 <plain>
-<text x="-129.54" y="55.88" size="1.778" layer="91">Parts Needed:
-Accelerometer (I2C?)
+<text x="-129.54" y="45.72" size="1.778" layer="91">Parts Needed:
 MCU
-Wireless Connection Interface (Wifi, BT)
-Motor Drivers
 Battery/VCC source
+
+Peripherals:
+Accelerometer (I2C?)
+Barometer/Pressure Sensor
+Wireless Connection Interface (Wifi, BT)
+Motor Drivers (ESCs)
 Flight Controller?</text>
 <text x="139.7" y="119.38" size="1.778" layer="91" grouprefs="MOTORS">1S or 2S-3S LiPo battery packs?
 motor drivers needed?

@@ -9222,6 +9222,7 @@ MCU Heartbeat (1 second)
 Wifi Connection (2 LEDs, While Conn Established, On Rx)
 Accelerometer Update (0.5 second)</text>
 <text x="-38.1" y="30.48" size="1.778" layer="91" grouprefs="ESP8266">Operating Voltage: 5V
+PWM Pins: D2 is I2C and PWM. need to use SPI instead?
 Powers ICM-20600 Accelerometer off of 3V3 Power</text>
 <text x="-127" y="114.3" size="0.6096" layer="91" grouprefs="3.7VCONNECTOR">Include Battery Charging Circuitry?
 Include Battery Indicator Circuitry
@@ -9657,6 +9658,11 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 <wire x1="78.74" y1="101.6" x2="119.38" y2="101.6" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <junction x="119.38" y="101.6" grouprefs="ACCELEROMETER"/>
 </segment>
+<segment>
+<pinref part="A1" gate="G$1" pin="EN"/>
+<wire x1="-71.12" y1="17.78" x2="-78.74" y2="17.78" width="0.1524" layer="91"/>
+<label x="-78.74" y="17.78" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="N$1" class="0">
 <segment>
@@ -9764,12 +9770,6 @@ https://how2electronics.com/power-supply-for-nodemcu-with-battery-charger-booste
 <pinref part="JP8" gate="A" pin="2"/>
 <wire x1="167.64" y1="33.02" x2="142.24" y2="33.02" width="0.1524" layer="91" grouprefs="MOTORS"/>
 <label x="142.24" y="33.02" size="1.778" layer="95" grouprefs="MOTORS"/>
-</segment>
-</net>
-<net name="N$2" class="0">
-<segment>
-<pinref part="A1" gate="G$1" pin="EN"/>
-<wire x1="-71.12" y1="17.78" x2="-78.74" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
