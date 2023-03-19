@@ -1,6 +1,13 @@
 # Drone
 Drone projects including PCB design, Frame, and Software
 
+## Design
+
+battery size
+
+motors brushless or brushed
+
+drone physical size
 
 
 ## PCB
