@@ -9,29 +9,31 @@
 #include <ESP8266WiFi.h>
 #include <ros.h>
 #include <std_msgs/String.h>
-// Accelerometer Libraries if MPU6050 is used and native I2C Is Used
-//#include <Adafruit_MPU6050.h>
-//#include <Adafruit_Sensor.h>
-//#include <Wire.h>
-
+// Accelerometer Libraries if MPU6050 is used
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
 // PINOUT
 //-------
-//int pwm_motor_FL =
-//int pwm_motor_FR =
-//intpwm_motor_RL =
-//int pwm_motor_RR =
-//int i2c_sda =
-//int i2c_scl =
-int gpio_led_heartbeat = D5;
-int gpio_led_wifi_connected = D7;  // GPIO13
-int gpio_led_wifi_datarx = D6;
-//int gpio_led_accel_status =
-//int gpio_battery_low_status = 
+int pwm_motor_FL = D5;
+int pwm_motor_FR = D6;
+int pwm_motor_RL = D8;
+int pwm_motor_RR = D0; //GPIO16  
+//NOTE: D0 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D0 PWM Signal.
+//NOTE: D0 outputs a HIGH signal at Boot which will turn on the Motor for RR. Need to make sure VCC for motors is disconnected when booting on MCU. 
+//Potential Solution: Add RST button circuitry to PCB which triggers reset of NodeMCU + temporarily turns off motor drivers.
+
+int i2c_sda = D2; //USED FOR I2C, comes from hardware variant definition for NodeMCU
+int i2c_scl = D1; //USED FOR I2C, comes from hardware variant definition for NodeMCU
+int gpio_led_heartbeat = D3;
+int gpio_led_wifi_conn = D7; // GPIO13
+int gpio_led_wifi_rx = D4;
+//NOTE: D4 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D4 HIGH/LOW Status.
 
 // WIFI Connection
 //----------------
-const char* ssid     = "";
+const char* ssid = "";
 const char* password = "";
 
 // GUI Server
@@ -40,8 +42,9 @@ WiFiServer gui_server(80);
 
 // ROS Interface
 //--------------
+bool ros_is_used = true;
 // Set the rosserial socket server IP address (Same as roscore)
-IPAddress ros_socket_server(192,168,1,200);
+IPAddress ros_socket_server(192, 168, 1, 200);
 // Set the rosserial socket server port (default is 11411)
 const uint16_t ros_socket_serverPort = 11411;
 
@@ -50,11 +53,15 @@ ros::NodeHandle drone_rosnode_handle;
 std_msgs::String str_msg;
 ros::Publisher chatter("Command", &str_msg);
 char hold[5] = "Hold";
-char gui_command[5] = "Hold"; //default command
+char gui_command[5] = "Hold";  //default command
 
-// Connect to Wifi
+// IMU
+//----------
+Adafruit_MPU6050 mpu;
+
+// FUNCTION: Connect to Wifi
 // Description: initialize connection to specified wifi network
-void connect_to_wifi(){
+void connect_to_wifi() {
   Serial.print("Connecting to WiFi: ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -69,21 +76,21 @@ void connect_to_wifi(){
   check_wifi_status();
 }
 
-// Check Wifi Status
+// FUNCTION: Check Wifi Status
 // Description: Check Wifi status, update Wifi LED accordingly.
-bool check_wifi_status(){
-  bool wifistatus = WiFi.status() == WL_CONNECTED
-  if(wifistatus){
-    digitalWrite(gpio_led_wifi_connected, HIGH);
+bool check_wifi_status() {
+  bool wifi_status_connected = WiFi.status() == WL_CONNECTED;
+  if (wifi_status_connected) {
+    digitalWrite(gpio_led_wifi_conn, HIGH);
   } else {
-    digitalWrite(gpio_led_wifi_connected, HIGH);    
+    digitalWrite(gpio_led_wifi_conn, LOW);
   }
-  return wifistatus
+  return wifi_status_connected;
 }
 
-// Initialize GUI Server
+// FUNCTION: Initialize GUI Server
 // Description: Create a GUI server with an http webpage for User to enter commands
-void initialize_gui_server(){
+void initialize_gui_server() {
   gui_server.begin();
   Serial.println("GUI Server started");
   Serial.print("Use this URL to connect to GUI: ");
@@ -92,131 +99,10 @@ void initialize_gui_server(){
   Serial.println("/");
 }
 
-void get_commands_from_gui_client(){
-
-}
-
-void read_imu_data(){
-  
-}
-
-// Initialize ROS Serial Socket Server Connection
-// Description: Initialize a connection to a ROS Socket Server running on a different machine.
-void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t port){
-  drone_rosnode_handle.getHardware()->setConnection(server, port);
-  Serial.println("Connected to ROS socket server");
-  drone_rosnode_handle.initNode();
-  Serial.print("IP = ");
-  Serial.println(drone_rosnode_handle.getHardware()->getLocalIP());
-}
-
-void transmit_ros_topic(){
-  
-}
-
-
-class heartbeatLED
-{
-	// Class Member Variables
-	// These are initialized at startup
-	int ledPin;      // the number of the LED pin
-	long OnTime;     // milliseconds of on-time
-	long OffTime;    // milliseconds of off-time
-
-	// These maintain the current state
-	int ledState;             		// ledState used to set the LED
-	unsigned long previousMillis;  	// will store last time LED was updated
-
-  // Constructor - creates a heartbeatLED
-  // and initializes the member variables and state
-  public:
-  heartbeatLED(int pin, long on, long off)
-  {
-	ledPin = pin;
-	pinMode(ledPin, OUTPUT);     
-	  
-	OnTime = on;
-	OffTime = off;
-	
-	ledState = LOW; 
-	previousMillis = 0;
-  }
-
-  void Update()
-  {
-    // check to see if it's time to change the state of the LED
-    unsigned long currentMillis = millis();
-     
-    if((ledState == HIGH) && (currentMillis - previousMillis >= OnTime))
-    {
-    	ledState = LOW;  // Turn it off
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
-    }
-    else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime))
-    {
-      ledState = HIGH;  // turn it on
-      previousMillis = currentMillis;   // Remember the time
-      digitalWrite(ledPin, ledState);	  // Update the actual LED
-    }
-  }
-};
-
-heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
-
-/* SETUP
-*
-*
-*/
-void setup()
-{
-  // Initialize serial debug interface
-  Serial.begin(115200);
-  Serial.println();
-
-  // Initializing Pins
-  pinMode(gpio_led_heartbeat, OUTPUT);  
-  pinMode(gpio_led_wifi_connected, OUTPUT);
-  pinMode(gpio_led_wifi_datarx, OUTPUT);
-
-  // Connect the ESP8266 the the wifi AP
-  connect_to_wifi();
-
-  // Initialize GUI Server
-  initialize_gui_server();
-
-  // Initialize ROS Serial Socket Server Connection
-  // Set the connection to rosserial socket server
-  initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
-
-  // Initiate ROS Messages
-  drone_rosnode_handle.advertise(chatter);
-}
-
-/* Main Loop
-*
-*
-*/
-void loop()
-{
-  // Every Loop Check:
-  heartbeat.Update();
-  check_wifi_status();
-  //batterylife();
-  //accelerometer();
-  
-  if (drone_rosnode_handle.connected()) {
-    //Serial.println("Connected");
-    // Say hello
-    str_msg.data = gui_command;
-    chatter.publish( &str_msg );
-  }
-  //} else {
-  //  Serial.println("Not Connected");
-  //}
-  drone_rosnode_handle.spinOnce();
-
-  // Check if a client has connected
+// FUNCTION: Get Commands from GUI Client
+// Description: Generate HTML Webpage. Get commands from GUI Client. 
+void get_commands_from_gui_client() {
+    // Check if a client has connected
   WiFiClient gui_client = gui_server.available();
   if (!gui_client) {
     return;
@@ -224,7 +110,7 @@ void loop()
 
   // Wait until the client sends some data
   Serial.println("new client");
-  while(!gui_client.available()){
+  while (!gui_client.available()) {
     delay(1);
   }
 
@@ -234,39 +120,39 @@ void loop()
   gui_client.flush();
 
   // interpret Request
-  if (request.indexOf("/CMD=UP") != -1)  {
+  if (request.indexOf("/CMD=UP") != -1) {
     char gui_command[3] = "UP";
   }
-  if (request.indexOf("/CMD=DOWN") != -1)  {
+  if (request.indexOf("/CMD=DOWN") != -1) {
     char gui_command[5] = "DOWN";
   }
-  if (request.indexOf("/CMD=LEFT") != -1)  {
+  if (request.indexOf("/CMD=LEFT") != -1) {
     char gui_command[5] = "LEFT";
   }
-  if (request.indexOf("/CMD=RIGHT") != -1)  {
+  if (request.indexOf("/CMD=RIGHT") != -1) {
     char gui_command[6] = "RIGHT";
   }
-  if (request.indexOf("/CMD=FORWARD") != -1)  {
+  if (request.indexOf("/CMD=FORWARD") != -1) {
     char gui_command[8] = "FORWARD";
   }
-  if (request.indexOf("/CMD=BACKWARD") != -1)  {
+  if (request.indexOf("/CMD=BACKWARD") != -1) {
     char gui_command[9] = "BACKWARD";
   }
   // if any command recieved, digital write wifi rx pin
-  digitalWrite(gpio_led_wifi_datarx, HIGH);
+  digitalWrite(gpio_led_wifi_rx, HIGH);
   delay(100);
-  digitalWrite(gpio_led_wifi_datarx, LOW);  
+  digitalWrite(gpio_led_wifi_rx, LOW);
 
   // Return the response
   gui_client.println("HTTP/1.1 200 OK");
   gui_client.println("Content-Type: text/html");
-  gui_client.println(""); //  do not forget this one
+  gui_client.println("");  //  do not forget this one
   gui_client.println("<!DOCTYPE HTML>");
   gui_client.println("<html>");
 
   gui_client.print("GUI Command: ");
   gui_client.print(gui_command);
-  
+
   gui_client.println("<br><br>");
   gui_client.println("<a href=\"/CMD=UP\"\"><button>UP</button></a>");
   gui_client.println("<a href=\"/CMD=DOWN\"\"><button>DOWN</button></a><br />");
@@ -279,7 +165,232 @@ void loop()
   delay(1);
   Serial.println("GUI Client disconnected");
   Serial.println("");
+}
+
+// FUNCTION: Initialize IMU
+// Description: initialize connection to IMU over I2C
+void initialize_imu(){
+    // Try to initialize!
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  Serial.print("Accelerometer range set to: ");
+  switch (mpu.getAccelerometerRange()) {
+  case MPU6050_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case MPU6050_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case MPU6050_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case MPU6050_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  Serial.print("Gyro range set to: ");
+  switch (mpu.getGyroRange()) {
+  case MPU6050_RANGE_250_DEG:
+    Serial.println("+- 250 deg/s");
+    break;
+  case MPU6050_RANGE_500_DEG:
+    Serial.println("+- 500 deg/s");
+    break;
+  case MPU6050_RANGE_1000_DEG:
+    Serial.println("+- 1000 deg/s");
+    break;
+  case MPU6050_RANGE_2000_DEG:
+    Serial.println("+- 2000 deg/s");
+    break;
+  }
+}
+
+// FUNCTION: Read IMU
+// Description: read IMU data
+void read_imu_data() {
+  /* Get new sensor events with the readings */
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  /* Print out the values */
+  Serial.print("Acceleration X: ");
+  Serial.print(a.acceleration.x);
+  Serial.print(", Y: ");
+  Serial.print(a.acceleration.y);
+  Serial.print(", Z: ");
+  Serial.print(a.acceleration.z);
+  Serial.println(" m/s^2");
+
+  Serial.print("Rotation X: ");
+  Serial.print(g.gyro.x);
+  Serial.print(", Y: ");
+  Serial.print(g.gyro.y);
+  Serial.print(", Z: ");
+  Serial.print(g.gyro.z);
+  Serial.println(" rad/s");
+
+  Serial.print("Temperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" degC");
+}
+
+// FUNCTION: Initialize ROS Serial Socket Server Connection
+// Description: Initialize a connection to a ROS Socket Server running on a different machine.
+void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t port) {
+  drone_rosnode_handle.getHardware()->setConnection(server, port);
+  Serial.println("Connected to ROS socket server");
+  drone_rosnode_handle.initNode();
+  Serial.print("IP = ");
+  Serial.println(drone_rosnode_handle.getHardware()->getLocalIP());
+}
+
+// FUNCTION: Transmit ROS Topic
+// Description: Transmit ROS Topic 
+void transmit_ros_topic() {
+}
+
+// CLASS: Heartbeat LED
+// Description: Class to create a heartbeat LED that will not block CPU in order to update.
+class heartbeatLED {
+  // Class Member Variables
+  // These are initialized at startup
+  int ledPin;    // the number of the LED pin
+  long OnTime;   // milliseconds of on-time
+  long OffTime;  // milliseconds of off-time
+
+  // These maintain the current state
+  int ledState;                  // ledState used to set the LED
+  unsigned long previousMillis;  // will store last time LED was updated
+
+  // Constructor - creates a heartbeatLED
+  // and initializes the member variables and state
+public:
+  heartbeatLED(int pin, long on, long off) {
+    ledPin = pin;
+    pinMode(ledPin, OUTPUT);
+
+    OnTime = on;
+    OffTime = off;
+
+    ledState = LOW;
+    previousMillis = 0;
+  }
+
+  bool Update() {
+    // check to see if it's time to change the state of the LED
+    // update LED, return state of LED
+    unsigned long currentMillis = millis();
+
+    if ((ledState == HIGH) && (currentMillis - previousMillis >= OnTime)) {
+      ledState = LOW;                  // Turn it off
+      previousMillis = currentMillis;  // Remember the time
+      digitalWrite(ledPin, ledState);  // Update the actual LED
+    } else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime)) {
+      ledState = HIGH;                 // turn it on
+      previousMillis = currentMillis;  // Remember the time
+      digitalWrite(ledPin, ledState);  // Update the actual LED
+    }
+
+    return ledState == HIGH;    
+  }
+};
+
+// Instantiate Global Variables from Above.
+heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
+
+/* SETUP
+*
+*
+*/
+void setup() {
+  // Initializing Pins
+  pinMode(pwm_motor_FL, OUTPUT);
+  pinMode(pwm_motor_FR, OUTPUT);
+  pinMode(pwm_motor_RL, OUTPUT);
+  pinMode(pwm_motor_RR, OUTPUT);
+  analogWrite(pwm_motor_FL, 0);
+  analogWrite(pwm_motor_FR, 0);
+  analogWrite(pwm_motor_RL, 0);
+  analogWrite(pwm_motor_RR, 0);
+  pinMode(gpio_led_wifi_conn, OUTPUT);
+  pinMode(gpio_led_wifi_rx, OUTPUT);
+  digitalWrite(gpio_led_wifi_conn, LOW);
+  digitalWrite(gpio_led_wifi_rx, LOW);
+
+  // Initialize Heartbeat
+  heartbeat.Update();
+
+  // Initialize serial debug interface
+  Serial.begin(115200);
+  Serial.println();
+
+  // Connect the ESP8266 the the wifi AP
+  connect_to_wifi();
+
+  // Initialize GUI Server
+  initialize_gui_server();
+
+  // Initialize IMU
+  initialize_imu();
+
+  // Initialize ROS Serial Socket Server Connection
+  // Set the connection to rosserial socket server and start advertising messages
+  initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
+  drone_rosnode_handle.advertise(chatter);
+}
+
+/* Main Loop
+*
+*
+*/
+void loop() {
+  
+  /* Update Variables:
+  *  -----------------
+  *  Collect Data from various sources such as: heartbeat, wifi status, IMU, GUI
+  */
+  bool heartbeat_signal = heartbeat.Update();
+  bool wifi_connected = check_wifi_status();
+  //check_battery_life(); - analog input from battery monitoring circuitry 0-1v = 0%->100%
+  read_imu_data();
+  get_commands_from_gui_client();
+
+  /* Update ROS Network:
+  *  -----------------
+  *  Publish Data from various sources such as: heartbeat, wifi status, IMU, GUI
+  *  to ROS Network
+  */
+  //TODO
+  //if(ros_is_used){ }
+  // All ROS is done in this if(), so if user doesnt want to use ROS it can be removed in one spot
+  if (drone_rosnode_handle.connected()) {
+    //Serial.println("Connected");
+    // Say hello
+    str_msg.data = gui_command;
+    chatter.publish(&str_msg);
+  }
+  //} else {
+  //  Serial.println("Not Connected");
+  //}
+  drone_rosnode_handle.spinOnce();
+
+
+  /* Flight Controller:
+  *  ------------------
+  *  Perform Flight Control using inputs  
+  *
+  */
+  //flight_controller();
+
 
   // Loop at 1Hz
-  delay(1000);
+  //delay(1000);
 }
