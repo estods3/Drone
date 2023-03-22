@@ -6,8 +6,12 @@
  * This SW is the main controller for a NodeMCU-based quadcopter.
  *
  */
+ #include <cmath>
 #include <ESP8266WiFi.h>
 #include <ros.h>
+  #include <ros/time.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/Range.h>
 #include <std_msgs/String.h>
 // Accelerometer Libraries if MPU6050 is used
 #include <Adafruit_MPU6050.h>
@@ -24,17 +28,20 @@ int pwm_motor_RR = D0; //GPIO16
 //NOTE: D0 outputs a HIGH signal at Boot which will turn on the Motor for RR. Need to make sure VCC for motors is disconnected when booting on MCU. 
 //Potential Solution: Add RST button circuitry to PCB which triggers reset of NodeMCU + temporarily turns off motor drivers.
 
-int i2c_sda = D2; //USED FOR I2C, comes from hardware variant definition for NodeMCU
 int i2c_scl = D1; //USED FOR I2C, comes from hardware variant definition for NodeMCU
+int i2c_sda = D2; //USED FOR I2C, comes from hardware variant definition for NodeMCU
 int gpio_led_heartbeat = D3;
-int gpio_led_wifi_conn = D7; // GPIO13
 int gpio_led_wifi_rx = D4;
+int gpio_led_wifi_conn = D7; // GPIO13
 //NOTE: D4 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D4 HIGH/LOW Status.
 
+// Calibration
+//------------
 // WIFI Connection
-//----------------
-const char* ssid = "";
+const char* ssid     = "";
 const char* password = "";
+#define ros_is_used true
+int wifi_rx_flash_duration_ms = 10;
 
 // GUI Server
 //------------
@@ -42,18 +49,23 @@ WiFiServer gui_server(80);
 
 // ROS Interface
 //--------------
-bool ros_is_used = true;
-// Set the rosserial socket server IP address (Same as roscore)
-IPAddress ros_socket_server(192, 168, 1, 200);
-// Set the rosserial socket server port (default is 11411)
-const uint16_t ros_socket_serverPort = 11411;
+#ifdef ros_is_used
+  // Set the rosserial socket server IP address (Same as roscore)
+  IPAddress ros_socket_server(192, 168, 1, 200);
+  // Set the rosserial socket server port (default is 11411)
+  const uint16_t ros_socket_serverPort = 11411;
 
-ros::NodeHandle drone_rosnode_handle;
-// Make a chatter publisher
-std_msgs::String str_msg;
-ros::Publisher chatter("Command", &str_msg);
-char hold[5] = "Hold";
-char gui_command[5] = "Hold";  //default command
+  ros::NodeHandle drone_rosnode_handle;
+  // Make a chatter publisher
+  std_msgs::String str_msg;
+  ros::Publisher chatter("Command", &str_msg);
+  String gui_command = "Hold";  //default command 
+
+  sensor_msgs::Imu imu_msg;
+  //sensor_msgs::Range range_msg;
+  ros::Publisher pub_imu("/imu/data", &imu_msg);
+  //ros::Publisher pub_ran( "/range/test", &range_msg);
+#endif
 
 // IMU
 //----------
@@ -101,11 +113,11 @@ void initialize_gui_server() {
 
 // FUNCTION: Get Commands from GUI Client
 // Description: Generate HTML Webpage. Get commands from GUI Client. 
-void get_commands_from_gui_client() {
+String get_commands_from_gui_client() {
     // Check if a client has connected
   WiFiClient gui_client = gui_server.available();
   if (!gui_client) {
-    return;
+    return "HOLD";
   }
 
   // Wait until the client sends some data
@@ -121,26 +133,26 @@ void get_commands_from_gui_client() {
 
   // interpret Request
   if (request.indexOf("/CMD=UP") != -1) {
-    char gui_command[3] = "UP";
+    request = "UP";
   }
   if (request.indexOf("/CMD=DOWN") != -1) {
-    char gui_command[5] = "DOWN";
+    request = "DOWN";
   }
   if (request.indexOf("/CMD=LEFT") != -1) {
-    char gui_command[5] = "LEFT";
+    request = "LEFT";
   }
   if (request.indexOf("/CMD=RIGHT") != -1) {
-    char gui_command[6] = "RIGHT";
+    request = "RIGHT";
   }
   if (request.indexOf("/CMD=FORWARD") != -1) {
-    char gui_command[8] = "FORWARD";
+    request = "FORWARD";
   }
   if (request.indexOf("/CMD=BACKWARD") != -1) {
-    char gui_command[9] = "BACKWARD";
+    request = "BACKWARD";
   }
   // if any command recieved, digital write wifi rx pin
   digitalWrite(gpio_led_wifi_rx, HIGH);
-  delay(100);
+  delay(wifi_rx_flash_duration_ms);
   digitalWrite(gpio_led_wifi_rx, LOW);
 
   // Return the response
@@ -151,7 +163,7 @@ void get_commands_from_gui_client() {
   gui_client.println("<html>");
 
   gui_client.print("GUI Command: ");
-  gui_client.print(gui_command);
+  gui_client.print(request);
 
   gui_client.println("<br><br>");
   gui_client.println("<a href=\"/CMD=UP\"\"><button>UP</button></a>");
@@ -165,6 +177,8 @@ void get_commands_from_gui_client() {
   delay(1);
   Serial.println("GUI Client disconnected");
   Serial.println("");
+
+  return request;
 }
 
 // FUNCTION: Initialize IMU
@@ -215,31 +229,50 @@ void initialize_imu(){
 
 // FUNCTION: Read IMU
 // Description: read IMU data
+//https://atadiat.com/en/e-ros-imu-and-arduino-how-to-send-to-ros/
 void read_imu_data() {
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  /* Print out the values */
-  Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
-  Serial.print(", Y: ");
-  Serial.print(a.acceleration.y);
-  Serial.print(", Z: ");
-  Serial.print(a.acceleration.z);
-  Serial.println(" m/s^2");
+  if(ros_is_used){
+    double time_in_seconds = drone_rosnode_handle.now().toSec();
+    if(abs(time_in_seconds - (int)time_in_seconds) < 0.0001){
+      Serial.print("IMU Update to ROS: ");
+      Serial.print(time_in_seconds);
+      Serial.println();
+      imu_msg.header.frame_id =  "/imu";
+      imu_msg.header.stamp = drone_rosnode_handle.now();
+      imu_msg.angular_velocity.x = g.gyro.x;
+      imu_msg.angular_velocity.y = g.gyro.y;
+      imu_msg.angular_velocity.z = g.gyro.z;
+      imu_msg.linear_acceleration.x = a.acceleration.x;
+      imu_msg.linear_acceleration.y = a.acceleration.y;
+      imu_msg.linear_acceleration.z = a.acceleration.z;
+      pub_imu.publish(&imu_msg);
+    }
+  } else {
+    /* Print out the values */
+    Serial.print("Acceleration X: ");
+    Serial.print(a.acceleration.x);
+    Serial.print(", Y: ");
+    Serial.print(a.acceleration.y);
+    Serial.print(", Z: ");
+    Serial.print(a.acceleration.z);
+    Serial.println(" m/s^2");
 
-  Serial.print("Rotation X: ");
-  Serial.print(g.gyro.x);
-  Serial.print(", Y: ");
-  Serial.print(g.gyro.y);
-  Serial.print(", Z: ");
-  Serial.print(g.gyro.z);
-  Serial.println(" rad/s");
+    Serial.print("Rotation X: ");
+    Serial.print(g.gyro.x);
+    Serial.print(", Y: ");
+    Serial.print(g.gyro.y);
+    Serial.print(", Z: ");
+    Serial.print(g.gyro.z);
+    Serial.println(" rad/s");
 
-  Serial.print("Temperature: ");
-  Serial.print(temp.temperature);
-  Serial.println(" degC");
+    Serial.print("Temperature: ");
+    Serial.print(temp.temperature);
+    Serial.println(" degC");    
+  }
 }
 
 // FUNCTION: Initialize ROS Serial Socket Server Connection
@@ -328,7 +361,7 @@ void setup() {
   // Initialize Heartbeat
   heartbeat.Update();
 
-  // Initialize serial debug interface
+  // Initialize serial debug interface @115200 Baud
   Serial.begin(115200);
   Serial.println();
 
@@ -343,9 +376,15 @@ void setup() {
 
   // Initialize ROS Serial Socket Server Connection
   // Set the connection to rosserial socket server and start advertising messages
-  initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
-  drone_rosnode_handle.advertise(chatter);
+  if(ros_is_used){  
+    initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
+    //drone_rosnode_handle.advertise(chatter);
+    //drone_rosnode_handle.advertise(chatter);
+    drone_rosnode_handle.advertise(pub_imu);
+    //nh.advertise(pub_ran);
+  }
 }
+
 
 /* Main Loop
 *
@@ -361,26 +400,27 @@ void loop() {
   bool wifi_connected = check_wifi_status();
   //check_battery_life(); - analog input from battery monitoring circuitry 0-1v = 0%->100%
   read_imu_data();
-  get_commands_from_gui_client();
+  String gui_command = get_commands_from_gui_client();
 
   /* Update ROS Network:
   *  -----------------
   *  Publish Data from various sources such as: heartbeat, wifi status, IMU, GUI
   *  to ROS Network
   */
-  //TODO
-  //if(ros_is_used){ }
-  // All ROS is done in this if(), so if user doesnt want to use ROS it can be removed in one spot
-  if (drone_rosnode_handle.connected()) {
+  if(ros_is_used && drone_rosnode_handle.connected()) {
     //Serial.println("Connected");
     // Say hello
-    str_msg.data = gui_command;
+    const char* string1 = gui_command.c_str();
+    str_msg.data = string1;
     chatter.publish(&str_msg);
+    chatter.publish(&str_msg);
+    //pub_imu.publish(&imu_msg);
+    //pub_ran.publish(&range_msg);
+    drone_rosnode_handle.spinOnce();
   }
   //} else {
   //  Serial.println("Not Connected");
   //}
-  drone_rosnode_handle.spinOnce();
 
 
   /* Flight Controller:
