@@ -34,10 +34,17 @@ roscore
 in another terminal from PC run:
 
 ```
-roslaunch rosserial_server socket.launch port:=/dev/ttyUSB0
+roslaunch rosserial_server socket.launch
+
 ```
 
 This will create a rosserial server to interface with the nodeMCU controller.
+
+In another terminal launch:
+
+```
+rosrun imu_complementary_filter complementary_filter_node
+```
 
 ## User Interface
 
