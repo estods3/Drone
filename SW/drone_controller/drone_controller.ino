@@ -14,6 +14,7 @@
 #include <sensor_msgs/Range.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Char.h>
 #include <tf/transform_broadcaster.h>
 // Accelerometer Libraries if MPU6050 is used
 #include <Adafruit_MPU6050.h>
@@ -29,7 +30,6 @@ int pwm_motor_RR = D0; //GPIO16
 //NOTE: D0 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D0 PWM Signal.
 //NOTE: D0 outputs a HIGH signal at Boot which will turn on the Motor for RR. Need to make sure VCC for motors is disconnected when booting on MCU. 
 //Potential Solution: Add RST button circuitry to PCB which triggers reset of NodeMCU + temporarily turns off motor drivers.
-
 int i2c_scl = D1; //USED FOR I2C, comes from hardware variant definition for NodeMCU
 int i2c_sda = D2; //USED FOR I2C, comes from hardware variant definition for NodeMCU
 int gpio_led_heartbeat = D3;
@@ -60,22 +60,22 @@ const uint16_t ros_socket_serverPort = 11411;
 ros::NodeHandle drone_rosnode_handle;
 std_msgs::Bool bool_msg;
 ros::Publisher mcu_alive("MCUAlive", &bool_msg);
+ros::Publisher mcu_wifi("MCUWifi", &bool_msg);
 
 // Make a command publisher
-std_msgs::String str_msg;
-ros::Publisher command("Command", &str_msg);
+std_msgs::Char char_msg;
+ros::Publisher command("Command", &char_msg);
 String gui_command = "Hold";  //default command 
 
 sensor_msgs::Imu imu_msg;
-ros::Publisher pub_imu("/imu/data", &imu_msg);
+ros::Publisher pub_imu("imu/data_raw", &imu_msg);
 //sensor_msgs::Range range_msg;
 //ros::Publisher pub_ran( "/range/test", &range_msg);
 
-geometry_msgs::TransformStamped t;
-tf::TransformBroadcaster broadcaster;
-char base_link[] = "/base_link";
-char odom[] = "/odom";
-
+//geometry_msgs::TransformStamped t;
+//tf::TransformBroadcaster broadcaster;
+//char base_link[] = "/base_link";
+//char odom[] = "/odom";
 #endif
 
 // IMU
@@ -124,11 +124,11 @@ void initialize_gui_server() {
 
 // FUNCTION: Get Commands from GUI Client
 // Description: Generate HTML Webpage. Get commands from GUI Client. 
-String get_commands_from_gui_client() {
+char get_commands_from_gui_client() {
     // Check if a client has connected
   WiFiClient gui_client = gui_server.available();
   if (!gui_client) {
-    return "HOLD";
+    return 'H';
   }
 
   // Wait until the client sends some data
@@ -139,27 +139,28 @@ String get_commands_from_gui_client() {
 
   // Read the first line of the request
   String request = gui_client.readStringUntil('\r');
+  char c_request = 'H';
   Serial.println(request);
   gui_client.flush();
 
   // interpret Request
   if (request.indexOf("/CMD=UP") != -1) {
-    request = "UP";
+    c_request = 'U';
   }
   if (request.indexOf("/CMD=DOWN") != -1) {
-    request = "DOWN";
+    c_request = 'D';
   }
   if (request.indexOf("/CMD=LEFT") != -1) {
-    request = "LEFT";
+    c_request = 'L';
   }
   if (request.indexOf("/CMD=RIGHT") != -1) {
-    request = "RIGHT";
+    c_request = 'R';
   }
   if (request.indexOf("/CMD=FORWARD") != -1) {
-    request = "FORWARD";
+    c_request = 'F';
   }
   if (request.indexOf("/CMD=BACKWARD") != -1) {
-    request = "BACKWARD";
+    c_request = 'B';
   }
   // if any command recieved, digital write wifi rx pin
   digitalWrite(gpio_led_wifi_rx, HIGH);
@@ -174,7 +175,7 @@ String get_commands_from_gui_client() {
   gui_client.println("<html>");
 
   gui_client.print("GUI Command: ");
-  gui_client.print(request);
+  gui_client.print(c_request);
 
   gui_client.println("<br><br>");
   gui_client.println("<a href=\"/CMD=UP\"\"><button>UP</button></a>");
@@ -189,7 +190,7 @@ String get_commands_from_gui_client() {
   Serial.println("GUI Client disconnected");
   Serial.println("");
 
-  return request;
+  return c_request;
 }
 
 // FUNCTION: Initialize IMU
@@ -205,97 +206,49 @@ void initialize_imu(){
   Serial.println("MPU6050 Found!");
 
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  Serial.print("Accelerometer range set to: ");
-  switch (mpu.getAccelerometerRange()) {
-  case MPU6050_RANGE_2_G:
-    Serial.println("+-2G");
-    break;
-  case MPU6050_RANGE_4_G:
-    Serial.println("+-4G");
-    break;
-  case MPU6050_RANGE_8_G:
-    Serial.println("+-8G");
-    break;
-  case MPU6050_RANGE_16_G:
-    Serial.println("+-16G");
-    break;
-  }
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-  Serial.print("Gyro range set to: ");
-  switch (mpu.getGyroRange()) {
-  case MPU6050_RANGE_250_DEG:
-    Serial.println("+- 250 deg/s");
-    break;
-  case MPU6050_RANGE_500_DEG:
-    Serial.println("+- 500 deg/s");
-    break;
-  case MPU6050_RANGE_1000_DEG:
-    Serial.println("+- 1000 deg/s");
-    break;
-  case MPU6050_RANGE_2000_DEG:
-    Serial.println("+- 2000 deg/s");
-    break;
-  }
+  mpu.setGyroRange(MPU6050_RANGE_250_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  mpu.setInterruptPinLatch(true);
+  delay(100);
 }
 
-struct imu_data {
-    sensors_event_t a;
-    sensors_event_t g;
-    sensors_event_t t;
+struct imu_data{
+  sensors_event_t a;
+  sensors_event_t g;
+  sensors_event_t temp;  
 };
 
-// FUNCTION: Read IMU
-// Description: read IMU data
-//https://atadiat.com/en/e-ros-imu-and-arduino-how-to-send-to-ros/
-struct imu_data read_imu_data() {
-  // Get new sensor events with the readings
-  struct imu_data imu_data_sample;
+// FUNCTION: Read IMU data
+// Description: Read IMU data. Log to serial for serial plotter if log= true
+struct imu_data read_imu_data(bool log){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-   /*
-  if(ros_is_used && drone_rosnode_handle.connected()){
-    double time_in_seconds = drone_rosnode_handle.now().toSec();
-    if(abs(time_in_seconds - (int)time_in_seconds) < 0.0001){
-      Serial.print("IMU Update to ROS: ");
-      Serial.print(time_in_seconds);
-      Serial.println();
-      imu_msg.header.frame_id =  "/imu";
-      imu_msg.header.stamp = drone_rosnode_handle.now();
-      imu_msg.angular_velocity.x = g.gyro.x;
-      imu_msg.angular_velocity.y = g.gyro.y;
-      imu_msg.angular_velocity.z = g.gyro.z;
-      imu_msg.linear_acceleration.x = a.acceleration.x;
-      imu_msg.linear_acceleration.y = a.acceleration.y;
-      imu_msg.linear_acceleration.z = a.acceleration.z;
-      pub_imu.publish(&imu_msg);
-    }
-  } else {
-    // Print out the values
-    Serial.print("Acceleration X: ");
+  if(log){
+    Serial.print("AccelX:");
     Serial.print(a.acceleration.x);
-    Serial.print(", Y: ");
+    Serial.print(",");
+    Serial.print("AccelY:");
     Serial.print(a.acceleration.y);
-    Serial.print(", Z: ");
+    Serial.print(",");
+    Serial.print("AccelZ:");
     Serial.print(a.acceleration.z);
-    Serial.println(" m/s^2");
-
-    Serial.print("Rotation X: ");
+    Serial.print(", ");
+    Serial.print("GyroX:");
     Serial.print(g.gyro.x);
-    Serial.print(", Y: ");
+    Serial.print(",");
+    Serial.print("GyroY:");
     Serial.print(g.gyro.y);
-    Serial.print(", Z: ");
+    Serial.print(",");
+    Serial.print("GyroZ:");
     Serial.print(g.gyro.z);
-    Serial.println(" rad/s");
+    Serial.println("");      
+  }
 
-    Serial.print("Temperature: ");
-    Serial.print(temp.temperature);
-    Serial.println(" degC");    
-  }*/
-  imu_data_sample.a = a;
-  imu_data_sample.g = g;
-  imu_data_sample.t = temp;
-
-  return imu_data_sample;
+  struct imu_data dataset;
+  dataset.a = a;
+  dataset.g = g;
+  dataset.temp = temp;
+  return dataset;
 }
 
 // FUNCTION: Initialize ROS Serial Socket Server Connection
@@ -304,7 +257,7 @@ void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t p
   drone_rosnode_handle.getHardware()->setConnection(server, port);
   Serial.println("Connected to ROS socket server");
   drone_rosnode_handle.initNode();
-  broadcaster.init(drone_rosnode_handle);
+  //broadcaster.init(drone_rosnode_handle);
   Serial.print("IP = ");
   Serial.println(drone_rosnode_handle.getHardware()->getLocalIP());
 }
@@ -388,19 +341,19 @@ void setup() {
   connect_to_wifi();
 
   // Initialize GUI Server
-  //initialize_gui_server();
+  initialize_gui_server();
 
   // Initialize IMU
-  //initialize_imu();
+  initialize_imu();
 
   // Initialize ROS Serial Socket Server Connection
   // Set the connection to rosserial socket server and start advertising messages
   if(ros_is_used){  
     initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
-    //drone_rosnode_handle.advertise(command);
     drone_rosnode_handle.advertise(mcu_alive);
+    drone_rosnode_handle.advertise(mcu_wifi);
+    drone_rosnode_handle.advertise(command);
     drone_rosnode_handle.advertise(pub_imu);
-    //nh.advertise(pub_ran);
   }
 }
 
@@ -418,8 +371,8 @@ void loop() {
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
   //check_battery_life(); - analog input from battery monitoring circuitry 0-1v = 0%->100%
-  struct imu_data imu_data_set = read_imu_data();
-  //String gui_command = get_commands_from_gui_client();
+  struct imu_data imu_data_set = read_imu_data(false);
+  char gui_command = get_commands_from_gui_client();
 
   /* Update ROS Network:
   *  -----------------
@@ -428,41 +381,31 @@ void loop() {
   */  
   if(ros_is_used) {
     if(drone_rosnode_handle.connected()) {
-      t.header.frame_id = odom;
-      t.child_frame_id = base_link;
-      t.transform.translation.x = 1.0;
-      t.transform.rotation.x = 0.0;
-      t.transform.rotation.y = 0.0;
-      t.transform.rotation.z = 0.0;
-      t.transform.rotation.w = 1.0;
-      t.header.stamp = drone_rosnode_handle.now();
-      broadcaster.sendTransform(t);
-      
       bool_msg.data = heartbeat_signal;
       mcu_alive.publish(&bool_msg);
-      //Serial.print("HB: ");
-      //Serial.println(heartbeat_signal);
 
-      //const char* string1 = gui_command.c_str();
-      //str_msg.data = string1;
-      //command.publish(&str_msg);
+      bool_msg.data = wifi_connected;
+      mcu_wifi.publish(&bool_msg);
+
+      char_msg.data = gui_command;
+      command.publish(&char_msg);
 
       double time_in_seconds = drone_rosnode_handle.now().toSec();
       //Serial.print(time_in_seconds);
-      if(abs(time_in_seconds - (int)time_in_seconds) < 0.01){
-        Serial.print("IMU Update to ROS: ");
-        Serial.print(time_in_seconds);
-        Serial.println();
-        imu_msg.header.frame_id = "/imu";
-        imu_msg.header.stamp = drone_rosnode_handle.now();
-        imu_msg.angular_velocity.x = imu_data_set.g.gyro.x;
-        imu_msg.angular_velocity.y = imu_data_set.g.gyro.y;
-        imu_msg.angular_velocity.z = imu_data_set.g.gyro.z;
-        imu_msg.linear_acceleration.x = imu_data_set.a.acceleration.x;
-        imu_msg.linear_acceleration.y = imu_data_set.a.acceleration.y;
-        imu_msg.linear_acceleration.z = imu_data_set.a.acceleration.z;
-        pub_imu.publish(&imu_msg);
-      }
+      //if(abs(time_in_seconds - (int)time_in_seconds) < 0.01){
+      Serial.print("IMU Update to ROS: ");
+      Serial.print(time_in_seconds);
+      Serial.println();
+      imu_msg.header.frame_id = "/imu_link";
+      imu_msg.header.stamp = drone_rosnode_handle.now();
+      imu_msg.angular_velocity.x = imu_data_set.g.gyro.x;
+      imu_msg.angular_velocity.y = imu_data_set.g.gyro.y;
+      imu_msg.angular_velocity.z = imu_data_set.g.gyro.z;
+      imu_msg.linear_acceleration.x = imu_data_set.a.acceleration.x;
+      imu_msg.linear_acceleration.y = imu_data_set.a.acceleration.y;
+      imu_msg.linear_acceleration.z = imu_data_set.a.acceleration.z;
+      pub_imu.publish(&imu_msg);
+      //}
     }
     drone_rosnode_handle.spinOnce();
   }
@@ -476,5 +419,5 @@ void loop() {
 
 
   // Loop at 1Hz
-  //delay(1000);
+  delay(10);
 }
