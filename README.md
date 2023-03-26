@@ -15,6 +15,8 @@ single-board design with accelerometers, motor speed controllers, battery manage
 
 NodeMCU socket for controller with integrated wifi.
 
+![image](https://user-images.githubusercontent.com/13946498/227780319-d5eada6b-10d0-42fe-b5f7-ef49a47baa42.png)
+
 
 ## Frame
 
