@@ -6,7 +6,7 @@
  * This SW is the main controller for a NodeMCU-based quadcopter.
  *
  */
- #include <cmath>
+#include <cmath>
 #include <ESP8266WiFi.h>
 #include <ros.h>
 #include <ros/time.h>
@@ -20,13 +20,27 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include <Servo.h>
+
+// ESC CALIBRATION
+//-----------------
+//these values copied from the BlHeli configuration
+#define ESC_MIN_THROTTLE		        1040
+#define ESC_MAX_THROTTLE		        1960
+#define ESC_REVERSE_THROTTLE	        100 // NOT USED
+#define ESC_ARM_SIGNAL			        1000
+#define ESC_ARM_TIME			        2000
+#define ESC_DEADZONE_RANGE              100
+#define ESC_FLUTTER_RANGE               10
 
 // PINOUT
 //-------
+int gpio_battery_level = A0; //TODO - before using this pin, check voltage divider for voltage in range 0-1v and check current at both GND and at Vout of voltage divider. check that it is below current level for NodeMCU.
 int pwm_motor_FL = D5;
 int pwm_motor_FR = D6;
 int pwm_motor_RL = D8;
-int pwm_motor_RR = D0; //GPIO16  
+int pwm_motor_RR = D0; //GPIO16
+int ESC_FL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
 //NOTE: D0 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D0 PWM Signal.
 //NOTE: D0 outputs a HIGH signal at Boot which will turn on the Motor for RR. Need to make sure VCC for motors is disconnected when booting on MCU. 
 //Potential Solution: Add RST button circuitry to PCB which triggers reset of NodeMCU + temporarily turns off motor drivers.
@@ -42,8 +56,11 @@ int gpio_led_wifi_conn = D7; // GPIO13
 // WIFI Connection
 const char* ssid     = "";
 const char* password = "";
+#define TESTING_MODE  true
 #define ros_is_used true
 int wifi_rx_flash_duration_ms = 10;
+double rcScaleValue = 1;
+Servo esc;
 
 // GUI Server
 //------------
@@ -69,6 +86,10 @@ String gui_command = "Hold";  //default command
 
 sensor_msgs::Imu imu_msg;
 ros::Publisher pub_imu("imu/data_raw", &imu_msg);
+
+//TODO - need ROS messages and topics for commanded action (from GUI) and commanded speed to each ESC from Flight Controller (ints)
+//TODO - need ROS message for battery life (float)
+
 //sensor_msgs::Range range_msg;
 //ros::Publisher pub_ran( "/range/test", &range_msg);
 
@@ -162,6 +183,16 @@ char get_commands_from_gui_client() {
   if (request.indexOf("/CMD=BACKWARD") != -1) {
     c_request = 'B';
   }
+  if (request.indexOf("/CMD=FL_DEC") != -1) {
+    c_request = 'Z';
+  }
+  if (request.indexOf("/CMD=FL_INC") != -1) {
+    c_request = 'X';
+  }
+  if (request.indexOf("/CMD=FL_INIT") != -1) {
+    c_request = 'I';
+  }
+
   // if any command recieved, digital write wifi rx pin
   digitalWrite(gpio_led_wifi_rx, HIGH);
   delay(wifi_rx_flash_duration_ms);
@@ -178,12 +209,17 @@ char get_commands_from_gui_client() {
   gui_client.print(c_request);
 
   gui_client.println("<br><br>");
-  gui_client.println("<a href=\"/CMD=UP\"\"><button>UP</button></a>");
-  gui_client.println("<a href=\"/CMD=DOWN\"\"><button>DOWN</button></a><br />");
-  gui_client.println("<a href=\"/CMD=LEFT\"\"><button>LEFT</button></a>");
-  gui_client.println("<a href=\"/CMD=RIGHT\"\"><button>RIGHT</button></a><br />");
-  gui_client.println("<a href=\"/CMD=FORWARD\"\"><button>FORWARD</button></a>");
-  gui_client.println("<a href=\"/CMD=BACKWARD\"\"><button>BACKWARD</button></a><br />");
+  gui_client.println("<a href=\"/CMD=FL_INIT\"\"><button style=\"height:100px;width:400px\">ESC1 INIT</button></a><br />");
+  gui_client.println("<a href=\"/CMD=UP\"\"><button style=\"height:100px;width:400px\">UP</button></a>");
+  gui_client.println("<a href=\"/CMD=DOWN\"\"><button style=\"height:100px;width:400px\">DOWN</button></a><br />");
+  gui_client.println("<a href=\"/CMD=LEFT\"\"><button style=\"height:100px;width:400px\">LEFT</button></a>");
+  gui_client.println("<a href=\"/CMD=RIGHT\"\"><button style=\"height:100px;width:400px\">RIGHT</button></a><br />");
+  gui_client.println("<a href=\"/CMD=FORWARD\"\"><button style=\"height:100px;width:400px\">FORWARD</button></a>");
+  gui_client.println("<a href=\"/CMD=BACKWARD\"\"><button style=\"height:100px;width:400px\">BACKWARD</button></a><br />");
+  if(TESTING_MODE){
+    gui_client.println("<a href=\"/CMD=FL_DEC\"\"><button style=\"height:100px;width:400px\">TEST MOTOR THROTTLE DOWN</button></a><br />");
+    gui_client.println("<a href=\"/CMD=FL_INC\"\"><button style=\"height:100px;width:400px\">TEST MOTOR THROTTLE UP</button></a><br />");
+  }
   gui_client.println("</html>");
 
   delay(1);
@@ -262,6 +298,53 @@ void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t p
   Serial.println(drone_rosnode_handle.getHardware()->getLocalIP());
 }
 
+double DetermineRCScale()
+{
+    double range = ESC_MAX_THROTTLE - ESC_MIN_THROTTLE;
+    Serial.println(range / 1000);
+    return (range / 1000); //1000 is the normal range for PWM signals (1000us to 2000us)
+}
+
+int ScaleRCInput(int rcValue)
+{
+    return ((rcValue - 1000) * rcScaleValue) + ESC_MIN_THROTTLE;
+}
+
+void InitESC()
+{
+    esc.writeMicroseconds(ESC_ARM_SIGNAL);
+    unsigned long now = millis();
+    while (millis() < now + ESC_ARM_TIME)
+    {
+        esc.writeMicroseconds(ESC_MAX_THROTTLE);      
+    }
+    esc.writeMicroseconds(ESC_ARM_SIGNAL);
+}
+
+bool isDeadzone(int speed)
+{
+    if (speed >= (ESC_REVERSE_THROTTLE - ESC_DEADZONE_RANGE) && speed <= (ESC_REVERSE_THROTTLE + ESC_DEADZONE_RANGE))
+    {
+        return true;
+    }
+    return false;
+}
+
+void WriteSpeed(int speed)
+{
+    if (isDeadzone(speed)) speed == ESC_REVERSE_THROTTLE;
+
+    int curSpeed = esc.readMicroseconds();
+
+    if (curSpeed >= (speed - ESC_FLUTTER_RANGE) && curSpeed <= (speed + ESC_FLUTTER_RANGE))
+    {
+        return;
+    }
+
+    esc.writeMicroseconds(speed);
+}
+
+
 // CLASS: Heartbeat LED
 // Description: Class to create a heartbeat LED that will not block CPU in order to update.
 class heartbeatLED {
@@ -316,26 +399,20 @@ heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
 *
 */
 void setup() {
-  // Initializing Pins
-  pinMode(pwm_motor_FL, OUTPUT);
-  pinMode(pwm_motor_FR, OUTPUT);
-  pinMode(pwm_motor_RL, OUTPUT);
-  pinMode(pwm_motor_RR, OUTPUT);
-  analogWrite(pwm_motor_FL, 0);
-  analogWrite(pwm_motor_FR, 0);
-  analogWrite(pwm_motor_RL, 0);
-  analogWrite(pwm_motor_RR, 0);
+  // Initialize serial debug interface @115200 Baud
+  Serial.begin(115200);
+  Serial.println();
+
+  // Initializing LED Pins + Heartbeat LED
   pinMode(gpio_led_wifi_conn, OUTPUT);
   pinMode(gpio_led_wifi_rx, OUTPUT);
   digitalWrite(gpio_led_wifi_conn, LOW);
   digitalWrite(gpio_led_wifi_rx, LOW);
-
-  // Initialize Heartbeat
   heartbeat.Update();
 
-  // Initialize serial debug interface @115200 Baud
-  Serial.begin(115200);
-  Serial.println();
+  // Initialize ESCs
+  esc.attach(pwm_motor_FL, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
+  rcScaleValue = DetermineRCScale();
 
   // Connect the ESP8266 the the wifi AP
   connect_to_wifi();
@@ -416,8 +493,19 @@ void loop() {
   *
   */
   //flight_controller();
+  if(gui_command == 'I') InitESC();
+  
+  if(TESTING_MODE){
+    if(gui_command == 'Z') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE - 5;
+    if(gui_command == 'X') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE + 5;
+    Serial.print("Recieved: " );
+    Serial.println(ESC_FL_CURRENT_INPUT_VALUE);
+    int valueSpeed = ScaleRCInput(ESC_FL_CURRENT_INPUT_VALUE);
+    WriteSpeed(valueSpeed);
+    delay(20);
+  }
 
 
-  // Loop at 1Hz
-  delay(10);
+  // Loop
+  delay(1);
 }
