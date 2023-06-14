@@ -64,10 +64,10 @@
 <wire x1="44.81" y1="5.08" x2="44.81" y2="88.9" width="0" layer="20" grouprefs="ALL"/>
 <wire x1="44.81" y1="88.9" x2="1.27" y2="88.9" width="0" layer="20" grouprefs="ALL"/>
 <wire x1="1.27" y1="88.9" x2="1.27" y2="5.08" width="0" layer="20" grouprefs="ALL"/>
-<hole x="7.79" y="71.12" drill="2.99999375" grouprefs="ALL ESC_MOUNT"/>
-<hole x="7.79" y="40.62" drill="2.99999375" grouprefs="ALL ESC_MOUNT"/>
-<hole x="38.2897375" y="40.62" drill="2.99999375" grouprefs="ALL ESC_MOUNT"/>
-<hole x="38.2897375" y="71.12" drill="2.99999375" grouprefs="ALL ESC_MOUNT"/>
+<hole x="7.79" y="71.12" drill="2.99999375" grouprefs="ESC_MOUNT ALL"/>
+<hole x="7.79" y="40.62" drill="2.99999375" grouprefs="ESC_MOUNT ALL"/>
+<hole x="38.2897375" y="40.62" drill="2.99999375" grouprefs="ESC_MOUNT ALL"/>
+<hole x="38.2897375" y="71.12" drill="2.99999375" grouprefs="ESC_MOUNT ALL"/>
 <circle x="38.2897375" y="40.62" radius="2.83980625" width="0.1524" layer="21" grouprefs="ALL"/>
 <circle x="7.79" y="40.62" radius="2.83980625" width="0.1524" layer="21" grouprefs="ALL"/>
 <circle x="7.79" y="71.12" radius="2.83980625" width="0.1524" layer="21" grouprefs="ALL"/>
@@ -81,9 +81,9 @@
 <text x="44.45" y="23.495" size="0.9906" layer="21" rot="R90" grouprefs="ALL">MCU</text>
 <text x="1.905" y="83.82" size="1.778" layer="21" grouprefs="ALL">Drone
 v1.0</text>
-<text x="16.51" y="78.74" size="1.524" layer="21" grouprefs="ALL">ANTENNA
+<text x="22.86" y="84.455" size="1.27" layer="21" align="center" grouprefs="ALL">ANTENNA
 No GND Plane
-15mm clearence</text>
+15mm clearance</text>
 <text x="15.24" y="38.735" size="0.635" layer="21" grouprefs="ALL">IMU Offset from (X,Y): (0,17.78) mm</text>
 <wire x1="23.057865625" y1="44.45" x2="23.057865625" y2="48.895" width="0.1524" layer="21" grouprefs="ALL"/>
 <wire x1="23.057865625" y1="44.45" x2="25.4" y2="44.45" width="0.1524" layer="21" grouprefs="ALL"/>

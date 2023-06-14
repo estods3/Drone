@@ -84,7 +84,7 @@ v1.0</text>
 <text x="16.51" y="78.74" size="1.524" layer="21" grouprefs="ALL">ANTENNA
 No GND Plane
 15mm clearence</text>
-<text x="16.51" y="38.735" size="0.762" layer="21" grouprefs="ALL">IMU Offset from (X,Y): (0,) mm</text>
+<text x="15.24" y="38.735" size="0.635" layer="21" grouprefs="ALL">IMU Offset from (X,Y): (0,17.78) mm</text>
 <wire x1="23.057865625" y1="44.45" x2="23.057865625" y2="48.895" width="0.1524" layer="21" grouprefs="ALL"/>
 <wire x1="23.057865625" y1="44.45" x2="25.4" y2="44.45" width="0.1524" layer="21" grouprefs="ALL"/>
 <wire x1="22.4028" y1="47.625" x2="23.057865625" y2="48.895" width="0.1524" layer="21" grouprefs="ALL"/>
@@ -105,6 +105,8 @@ No GND Plane
 <circle x="7.79" y="8.89" radius="2.83980625" width="0.1524" layer="21"/>
 <hole x="38.905" y="8.89" drill="2.99999375"/>
 <circle x="38.905" y="8.89" radius="2.83980625" width="0.1524" layer="21"/>
+<text x="42.545" y="57.785" size="2.54" layer="21" align="center">+
+_</text>
 </plain>
 <libraries>
 <library name="capacitor-wima" urn="urn:adsk.eagle:library:116">
