@@ -22,9 +22,20 @@
 #include <Wire.h>
 #include <Servo.h>
 
+// OPERATING MODES
+//----------------
+#define TESTING_MODE  true
+#define ros_is_used true
+
+//BMS CALIBRATION
+//---------------
+// Connect full battery to PCB and check displayed battery level on GUI. Adjust number below until GUI reads 100%.
+// This number reflects the bit-width of the ADC based on the voltage divider resistors used on PCB. Variation in resistor values is possible.
+#define BMS_MAX_BATTERY_BITS		        850
+
 // ESC CALIBRATION
 //-----------------
-//these values copied from the BlHeli configuration
+// These values copied from the BlHeli configuration.
 #define ESC_MIN_THROTTLE		        1040
 #define ESC_MAX_THROTTLE		        1960
 #define ESC_REVERSE_THROTTLE	        100 // NOT USED
@@ -35,7 +46,7 @@
 
 // PINOUT
 //-------
-int gpio_battery_level = A0; //TODO - before using this pin, check voltage divider for voltage in range 0-1v and check current at both GND and at Vout of voltage divider. check that it is below current level for NodeMCU.
+int gpio_battery_level = A0;
 int pwm_motor_FL = D5;
 int pwm_motor_FR = D6;
 int pwm_motor_RL = D8;
@@ -51,13 +62,10 @@ int gpio_led_wifi_rx = D4;
 int gpio_led_wifi_conn = D7; // GPIO13
 //NOTE: D4 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D4 HIGH/LOW Status.
 
-// Calibration
+// WiFI Calibration
 //------------
-// WIFI Connection
 const char* ssid     = "";
 const char* password = "";
-#define TESTING_MODE  true
-#define ros_is_used true
 int wifi_rx_flash_duration_ms = 10;
 double rcScaleValue = 1;
 Servo esc;
@@ -143,6 +151,14 @@ void initialize_gui_server() {
   Serial.println("/");
 }
 
+// FUNCTION Check Battery Life
+// Description: check battery life on pin: gpio_battery_level
+int check_battery_life(){
+  int v = analogRead(gpio_battery_level);
+  int battery_life = map(v, 0, BMS_MAX_BATTERY_BITS, 0, 100);
+  return battery_life;
+}
+
 // FUNCTION: Get Commands from GUI Client
 // Description: Generate HTML Webpage. Get commands from GUI Client. 
 char get_commands_from_gui_client() {
@@ -205,9 +221,13 @@ char get_commands_from_gui_client() {
   gui_client.println("<!DOCTYPE HTML>");
   gui_client.println("<html>");
 
-  gui_client.print("GUI Command: ");
+  gui_client.print("Command: ");
   gui_client.print(c_request);
-
+  gui_client.println("<br><br>");
+  gui_client.print("Battery Life: ");
+  gui_client.print(check_battery_life());
+  gui_client.print("%");
+  
   gui_client.println("<br><br>");
   gui_client.println("<a href=\"/CMD=FL_INIT\"\"><button style=\"height:100px;width:400px\">ESC1 INIT</button></a><br />");
   gui_client.println("<a href=\"/CMD=UP\"\"><button style=\"height:100px;width:400px\">UP</button></a>");
@@ -406,6 +426,7 @@ void setup() {
   // Initializing LED Pins + Heartbeat LED
   pinMode(gpio_led_wifi_conn, OUTPUT);
   pinMode(gpio_led_wifi_rx, OUTPUT);
+  pinMode(gpio_battery_level, INPUT);
   digitalWrite(gpio_led_wifi_conn, LOW);
   digitalWrite(gpio_led_wifi_rx, LOW);
   heartbeat.Update();
@@ -435,9 +456,12 @@ void setup() {
 }
 
 
-/* Main Loop
-*
-*
+/*___________________________________________________________________________________________ 
+* Main Loop
+* 1. Update Status Variables: Heartbeat Signal, Wifi Status, Battery Life, IMU, User Command.
+* 2. Update ROS Network: If ROS is Used, publish messages with data.
+* 3. Flight Controller: Control drone ESCs/Motors using information from Status above.
+* ___________________________________________________________________________________________
 */
 void loop() {
   
@@ -447,7 +471,7 @@ void loop() {
   */
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
-  //check_battery_life(); - analog input from battery monitoring circuitry 0-1v = 0%->100%
+  int battery_life = check_battery_life();
   struct imu_data imu_data_set = read_imu_data(false);
   char gui_command = get_commands_from_gui_client();
 
