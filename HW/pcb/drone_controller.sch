@@ -8762,107 +8762,6 @@ W = angled&lt;p&gt;
 </deviceset>
 </devicesets>
 </library>
-<library name="CD40109BE">
-<packages>
-<package name="DIP794W45P254L1969H508Q16">
-<circle x="-5.035" y="8.89" radius="0.1" width="0.2" layer="21"/>
-<circle x="-5.035" y="8.89" radius="0.1" width="0.2" layer="51"/>
-<wire x1="-3.175" y1="9.6525" x2="3.175" y2="9.6525" width="0.127" layer="51"/>
-<wire x1="-3.175" y1="-9.6525" x2="3.175" y2="-9.6525" width="0.127" layer="51"/>
-<wire x1="-3.175" y1="9.775" x2="3.175" y2="9.775" width="0.127" layer="21"/>
-<wire x1="-3.175" y1="-9.775" x2="3.175" y2="-9.775" width="0.127" layer="21"/>
-<wire x1="-3.175" y1="9.6525" x2="-3.175" y2="-9.6525" width="0.127" layer="51"/>
-<wire x1="3.175" y1="9.6525" x2="3.175" y2="-9.6525" width="0.127" layer="51"/>
-<wire x1="4.785" y1="10.095" x2="-4.785" y2="10.095" width="0.05" layer="39"/>
-<wire x1="4.785" y1="-10.095" x2="-4.785" y2="-10.095" width="0.05" layer="39"/>
-<wire x1="4.785" y1="10.095" x2="4.785" y2="-10.095" width="0.05" layer="39"/>
-<wire x1="-4.785" y1="10.095" x2="-4.785" y2="-10.095" width="0.05" layer="39"/>
-<text x="-4.6" y="-10.2" size="1.27" layer="27" align="top-left">&gt;VALUE</text>
-<text x="-4.6" y="10.2" size="1.27" layer="25">&gt;NAME</text>
-<pad name="1" x="-3.97" y="8.89" drill="0.78" diameter="1.13" shape="square"/>
-<pad name="2" x="-3.97" y="6.35" drill="0.78" diameter="1.13"/>
-<pad name="3" x="-3.97" y="3.81" drill="0.78" diameter="1.13"/>
-<pad name="4" x="-3.97" y="1.27" drill="0.78" diameter="1.13"/>
-<pad name="5" x="-3.97" y="-1.27" drill="0.78" diameter="1.13"/>
-<pad name="6" x="-3.97" y="-3.81" drill="0.78" diameter="1.13"/>
-<pad name="7" x="-3.97" y="-6.35" drill="0.78" diameter="1.13"/>
-<pad name="8" x="-3.97" y="-8.89" drill="0.78" diameter="1.13"/>
-<pad name="9" x="3.97" y="-8.89" drill="0.78" diameter="1.13"/>
-<pad name="10" x="3.97" y="-6.35" drill="0.78" diameter="1.13"/>
-<pad name="11" x="3.97" y="-3.81" drill="0.78" diameter="1.13"/>
-<pad name="12" x="3.97" y="-1.27" drill="0.78" diameter="1.13"/>
-<pad name="13" x="3.97" y="1.27" drill="0.78" diameter="1.13"/>
-<pad name="14" x="3.97" y="3.81" drill="0.78" diameter="1.13"/>
-<pad name="15" x="3.97" y="6.35" drill="0.78" diameter="1.13"/>
-<pad name="16" x="3.97" y="8.89" drill="0.78" diameter="1.13"/>
-</package>
-</packages>
-<symbols>
-<symbol name="CD40109BE">
-<wire x1="-12.7" y1="20.32" x2="12.7" y2="20.32" width="0.41" layer="94"/>
-<wire x1="12.7" y1="20.32" x2="12.7" y2="-20.32" width="0.41" layer="94"/>
-<wire x1="12.7" y1="-20.32" x2="-12.7" y2="-20.32" width="0.41" layer="94"/>
-<wire x1="-12.7" y1="-20.32" x2="-12.7" y2="20.32" width="0.41" layer="94"/>
-<text x="-12.7" y="21.32" size="2.0828" layer="95" ratio="10" rot="SR0">&gt;NAME</text>
-<text x="-12.7" y="-24.32" size="2.0828" layer="96" ratio="10" rot="SR0">&gt;VALUE</text>
-<pin name="A" x="-17.78" y="10.16" length="middle" direction="in"/>
-<pin name="B" x="-17.78" y="7.62" length="middle" direction="in"/>
-<pin name="C" x="-17.78" y="5.08" length="middle" direction="in"/>
-<pin name="D" x="-17.78" y="2.54" length="middle" direction="in"/>
-<pin name="EN_A" x="-17.78" y="0" length="middle" direction="in"/>
-<pin name="EN_B" x="-17.78" y="-2.54" length="middle" direction="in"/>
-<pin name="EN_C" x="-17.78" y="-5.08" length="middle" direction="in"/>
-<pin name="EN_D" x="-17.78" y="-7.62" length="middle" direction="in"/>
-<pin name="VCC" x="17.78" y="17.78" length="middle" direction="pwr" rot="R180"/>
-<pin name="VDD" x="17.78" y="15.24" length="middle" direction="pwr" rot="R180"/>
-<pin name="E" x="17.78" y="10.16" length="middle" direction="out" rot="R180"/>
-<pin name="F" x="17.78" y="7.62" length="middle" direction="out" rot="R180"/>
-<pin name="G" x="17.78" y="5.08" length="middle" direction="out" rot="R180"/>
-<pin name="H" x="17.78" y="2.54" length="middle" direction="out" rot="R180"/>
-<pin name="VSS" x="17.78" y="-15.24" length="middle" direction="pwr" rot="R180"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="CD40109BE" prefix="U">
-<description> &lt;a href="https://pricing.snapeda.com/parts/CD40109BE/Texas%20Instruments/view-part?ref=eda"&gt;Check availability&lt;/a&gt;</description>
-<gates>
-<gate name="G$1" symbol="CD40109BE" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="DIP794W45P254L1969H508Q16">
-<connects>
-<connect gate="G$1" pin="A" pad="3"/>
-<connect gate="G$1" pin="B" pad="6"/>
-<connect gate="G$1" pin="C" pad="10"/>
-<connect gate="G$1" pin="D" pad="14"/>
-<connect gate="G$1" pin="E" pad="4"/>
-<connect gate="G$1" pin="EN_A" pad="2"/>
-<connect gate="G$1" pin="EN_B" pad="7"/>
-<connect gate="G$1" pin="EN_C" pad="9"/>
-<connect gate="G$1" pin="EN_D" pad="15"/>
-<connect gate="G$1" pin="F" pad="5"/>
-<connect gate="G$1" pin="G" pad="11"/>
-<connect gate="G$1" pin="H" pad="13"/>
-<connect gate="G$1" pin="VCC" pad="1"/>
-<connect gate="G$1" pin="VDD" pad="16"/>
-<connect gate="G$1" pin="VSS" pad="8"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="AVAILABILITY" value="In Stock"/>
-<attribute name="DESCRIPTION" value=" CMOS Quad Low-to-High Voltage Level Shifter (20V Rating) "/>
-<attribute name="MF" value="Texas Instruments"/>
-<attribute name="MP" value="CD40109BE"/>
-<attribute name="PACKAGE" value="PDIP-16 Texas Instruments"/>
-<attribute name="PRICE" value="None"/>
-<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search?q=CD40109BE&amp;ref=eda"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 </attributes>
@@ -8875,9 +8774,6 @@ W = angled&lt;p&gt;
 <class number="1" name="Power" width="0.3048" drill="0.508">
 <clearance class="1" value="0.254"/>
 </class>
-<class number="2" name="I2C" width="0.254" drill="0.508">
-<clearance class="2" value="0.254"/>
-</class>
 <class number="3" name="Chip Power" width="0.0254" drill="0.0508">
 <clearance class="2" value="0.254"/>
 <clearance class="3" value="0.127"/>
@@ -8885,6 +8781,9 @@ W = angled&lt;p&gt;
 <class number="4" name="GPIO" width="0.254" drill="0.508">
 <clearance class="2" value="0.254"/>
 <clearance class="4" value="0.254"/>
+</class>
+<class number="5" name="IMU" width="0.0254" drill="0.0254">
+<clearance class="0" value="0.0254"/>
 </class>
 </classes>
 <groups>
@@ -8927,7 +8826,7 @@ W = angled&lt;p&gt;
 <part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="P+3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="VCC" device=""/>
 <part name="J1" library="con-JST-SH" deviceset="SM08B-SRSS-TB" device=""/>
-<part name="U3" library="CD40109BE" deviceset="CD40109BE" device=""/>
+<part name="SV1" library="con-lstb" library_urn="urn:adsk.eagle:library:162" deviceset="MA08-1" device="" package3d_urn="urn:adsk.eagle:package:8343/1"/>
 <part name="SUPPLY11" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 </parts>
 <sheets>
@@ -8936,37 +8835,31 @@ W = angled&lt;p&gt;
 <text x="-86.36" y="88.9" size="1.778" layer="91" grouprefs="BMS">Battery/VCC source - From ESC, regulate at 5V
 
 TODO - Test voltage divider circuit using power supply and NodeMCU test if value is read in</text>
-<text x="76.2" y="27.94" size="1.778" layer="91" grouprefs="ACCELEROMETER">VDD operating range of 1.71V to 3.45V (2.79mA @1.8v -&gt; 5.6mA @3.3V)
+<text x="76.2" y="30.48" size="1.778" layer="91" grouprefs="ACCELEROMETER">VDD operating range of 1.71V to 3.45V (2.79mA @1.8v -&gt; 5.6mA @3.3V)
 Setup for I2C Communication to MCU
 Host interface: 10 MHz SPI or 400 kHz Fast Mode I2C
-..do we need faster update rate?
 Source: https://invensense.tdk.com/wp-content/uploads/
 2021/05/DS-000184-ICM-20600-v1.1.pdf</text>
-<text x="27.94" y="83.82" size="1.778" layer="91" grouprefs="USER_INTERFACE">LEDs:
-Battery Status (ON=Low Battery) TODO
+<text x="58.42" y="78.74" size="1.778" layer="91" grouprefs="USER_INTERFACE">LEDs:
 MCU Heartbeat (1 second)
-Wifi Connection (2 LEDs, While Conn Established, On Rx)
-Accelerometer Update (0.5 second) TODO</text>
+Wifi Connection (2 LEDs, While Conn Established, On Rx)</text>
 <text x="-63.5" y="25.4" size="1.778" layer="91" grouprefs="ESP8266">Operating Voltage: 5V
-PWM Pins: NEED TO TEST, NEED TO CONFIRM FREQ and AMPLITUDE CONTROLS ESCs
+PWM Pins: FREQ and AMPLITUDE works with ESC (TESTED)
 D2 is I2C (TESTED)
 Powers ICM-20600 Accelerometer off of 3V3 Power
 REMINDER: GND plane CANNOT be beneath Antenna!! See: https://arduino.stackexchange.com/questions/
 55616/esp8266-does-it-really-have-terrible-wifi-range-by-default#:~:text=at%204%20meters%20%2D70,at
 %201%20meter%20%2D56</text>
-<text x="185.42" y="114.3" size="1.778" layer="91" grouprefs="ESC">PINOUT Based on 
+<text x="137.16" y="81.28" size="1.778" layer="91" grouprefs="ESC">PINOUT Based on 
 SpeedyBee 4-in-1 ESC</text>
-<text x="134.62" y="111.76" size="1.778" layer="91">Logic Level Shifter needed to 
-shift from NodeMCU 3V3 GPIO
-to ESC 5V Input</text>
 </plain>
 <instances>
-<instance part="SUPPLY2" gate="GND" x="86.36" y="63.5" smashed="yes" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="84.455" y="60.325" size="1.778" layer="96"/>
+<instance part="SUPPLY2" gate="GND" x="116.84" y="58.42" smashed="yes" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="120.015" y="57.785" size="1.778" layer="96"/>
 </instance>
-<instance part="U1" gate="G$1" x="96.52" y="2.54" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="NAME" x="83.7974" y="20.3517" size="1.781159375" layer="95"/>
-<attribute name="VALUE" x="83.7924" y="-17.8242" size="1.78186875" layer="96"/>
+<instance part="U1" gate="G$1" x="96.52" y="5.08" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="NAME" x="83.7974" y="22.8917" size="1.781159375" layer="95"/>
+<attribute name="VALUE" x="83.7924" y="-15.2842" size="1.78186875" layer="96"/>
 </instance>
 <instance part="A1" gate="G$1" x="-50.8" y="0" smashed="yes" grouprefs="ESP8266">
 <attribute name="NAME" x="-63.5" y="21.59" size="1.778" layer="95"/>
@@ -8976,11 +8869,11 @@ to ESC 5V Input</text>
 <attribute name="NAME" x="2.54" y="13.97" size="1.778" layer="95"/>
 <attribute name="VALUE" x="2.54" y="-16.51" size="1.778" layer="96" rot="MR180"/>
 </instance>
-<instance part="LED4" gate="G$1" x="66.04" y="78.74" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="70.612" y="84.455" size="1.778" layer="96" rot="R180"/>
+<instance part="LED4" gate="G$1" x="96.52" y="73.66" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="101.092" y="79.375" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="LED5" gate="G$1" x="66.04" y="73.66" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="70.612" y="79.375" size="1.778" layer="96" rot="R180"/>
+<instance part="LED5" gate="G$1" x="96.52" y="68.58" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="101.092" y="74.295" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="SUPPLY4" gate="GND" x="-30.48" y="-22.86" smashed="yes" grouprefs="ESP8266">
 <attribute name="VALUE" x="-32.385" y="-26.035" size="1.778" layer="96"/>
@@ -8988,33 +8881,33 @@ to ESC 5V Input</text>
 <instance part="SUPPLY5" gate="GND" x="35.56" y="-15.24" smashed="yes" grouprefs="ESP8266">
 <attribute name="VALUE" x="33.655" y="-18.415" size="1.778" layer="96"/>
 </instance>
-<instance part="SUPPLY6" gate="GND" x="116.84" y="-15.24" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="VALUE" x="114.935" y="-18.415" size="1.778" layer="96"/>
+<instance part="SUPPLY6" gate="GND" x="116.84" y="-12.7" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="114.935" y="-15.875" size="1.778" layer="96"/>
 </instance>
-<instance part="C4" gate="G$1" x="139.7" y="12.7" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="NAME" x="142.24" y="15.24" size="1.778" layer="95"/>
-<attribute name="VALUE" x="142.24" y="12.7" size="1.778" layer="96"/>
+<instance part="C4" gate="G$1" x="139.7" y="15.24" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="NAME" x="142.24" y="17.78" size="1.778" layer="95"/>
+<attribute name="VALUE" x="142.24" y="15.24" size="1.778" layer="96"/>
 </instance>
-<instance part="C5" gate="G$1" x="129.54" y="12.7" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="NAME" x="131.064" y="15.621" size="1.778" layer="95"/>
-<attribute name="VALUE" x="131.064" y="13.081" size="1.778" layer="96"/>
+<instance part="C5" gate="G$1" x="129.54" y="15.24" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="NAME" x="131.064" y="18.161" size="1.778" layer="95"/>
+<attribute name="VALUE" x="131.064" y="15.621" size="1.778" layer="96"/>
 </instance>
-<instance part="C6" gate="G$1" x="152.4" y="12.7" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="NAME" x="153.924" y="15.621" size="1.778" layer="95"/>
-<attribute name="VALUE" x="153.924" y="13.081" size="1.778" layer="96"/>
+<instance part="C6" gate="G$1" x="152.4" y="15.24" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="NAME" x="153.924" y="18.161" size="1.778" layer="95"/>
+<attribute name="VALUE" x="153.924" y="15.621" size="1.778" layer="96"/>
 </instance>
-<instance part="C7" gate="G$1" x="116.84" y="-5.08" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="NAME" x="118.364" y="-2.159" size="1.778" layer="95"/>
-<attribute name="VALUE" x="118.364" y="-4.699" size="1.778" layer="96"/>
+<instance part="C7" gate="G$1" x="116.84" y="-2.54" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="NAME" x="118.364" y="0.381" size="1.778" layer="95"/>
+<attribute name="VALUE" x="118.364" y="-2.159" size="1.778" layer="96"/>
 </instance>
-<instance part="SUPPLY7" gate="GND" x="134.62" y="5.08" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="VALUE" x="137.795" y="4.445" size="1.778" layer="96"/>
+<instance part="SUPPLY7" gate="GND" x="134.62" y="7.62" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="137.795" y="6.985" size="1.778" layer="96"/>
 </instance>
-<instance part="SUPPLY9" gate="GND" x="152.4" y="5.08" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="VALUE" x="150.495" y="1.905" size="1.778" layer="96"/>
+<instance part="SUPPLY9" gate="GND" x="152.4" y="7.62" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="150.495" y="4.445" size="1.778" layer="96"/>
 </instance>
-<instance part="LED6" gate="G$1" x="66.04" y="68.58" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
-<attribute name="VALUE" x="70.612" y="74.295" size="1.778" layer="96" rot="R180"/>
+<instance part="LED6" gate="G$1" x="96.52" y="63.5" smashed="yes" rot="R90" grouprefs="USER_INTERFACE">
+<attribute name="VALUE" x="101.092" y="69.215" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="R3" gate="G$1" x="-88.9" y="78.74" smashed="yes" rot="R90" grouprefs="BMS">
 <attribute name="NAME" x="-87.8586" y="77.47" size="1.778" layer="95"/>
@@ -9024,17 +8917,17 @@ to ESC 5V Input</text>
 <attribute name="NAME" x="-87.8586" y="64.77" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-88.138" y="62.23" size="1.778" layer="96"/>
 </instance>
-<instance part="R8" gate="G$1" x="81.28" y="78.74" smashed="yes" grouprefs="USER_INTERFACE">
-<attribute name="NAME" x="77.47" y="80.2386" size="1.778" layer="95"/>
-<attribute name="VALUE" x="82.55" y="80.2386" size="1.778" layer="96"/>
+<instance part="R8" gate="G$1" x="111.76" y="73.66" smashed="yes" grouprefs="USER_INTERFACE">
+<attribute name="NAME" x="107.95" y="75.1586" size="1.778" layer="95"/>
+<attribute name="VALUE" x="113.03" y="75.1586" size="1.778" layer="96"/>
 </instance>
-<instance part="R1" gate="G$1" x="81.28" y="73.66" smashed="yes" grouprefs="USER_INTERFACE">
-<attribute name="NAME" x="77.47" y="75.1586" size="1.778" layer="95"/>
-<attribute name="VALUE" x="82.55" y="75.1586" size="1.778" layer="96"/>
+<instance part="R1" gate="G$1" x="111.76" y="68.58" smashed="yes" grouprefs="USER_INTERFACE">
+<attribute name="NAME" x="107.95" y="70.0786" size="1.778" layer="95"/>
+<attribute name="VALUE" x="113.03" y="70.0786" size="1.778" layer="96"/>
 </instance>
-<instance part="R2" gate="G$1" x="81.28" y="68.58" smashed="yes" grouprefs="USER_INTERFACE">
-<attribute name="NAME" x="77.47" y="70.0786" size="1.778" layer="95"/>
-<attribute name="VALUE" x="82.55" y="70.0786" size="1.778" layer="96"/>
+<instance part="R2" gate="G$1" x="111.76" y="63.5" smashed="yes" grouprefs="USER_INTERFACE">
+<attribute name="NAME" x="107.95" y="64.9986" size="1.778" layer="95"/>
+<attribute name="VALUE" x="113.03" y="64.9986" size="1.778" layer="96"/>
 </instance>
 <instance part="C1" gate="G$1" x="-43.18" y="73.66" smashed="yes" grouprefs="BMS">
 <attribute name="NAME" x="-41.656" y="74.041" size="1.778" layer="95"/>
@@ -9044,9 +8937,9 @@ to ESC 5V Input</text>
 <attribute name="NAME" x="4.064" y="74.041" size="1.778" layer="95"/>
 <attribute name="VALUE" x="4.064" y="68.961" size="1.778" layer="96"/>
 </instance>
-<instance part="SV2" gate="1" x="144.78" y="-15.24" smashed="yes" grouprefs="ACCELEROMETER">
-<attribute name="VALUE" x="143.51" y="-27.94" size="1.778" layer="96"/>
-<attribute name="NAME" x="143.51" y="-1.778" size="1.778" layer="95"/>
+<instance part="SV2" gate="1" x="147.32" y="-12.7" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="146.05" y="-25.4" size="1.778" layer="96"/>
+<attribute name="NAME" x="146.05" y="0.762" size="1.778" layer="95"/>
 </instance>
 <instance part="U2" gate="G$1" x="-20.32" y="73.66" smashed="yes" grouprefs="BMS">
 <attribute name="NAME" x="-33.0589" y="82.06765" size="1.783440625" layer="95"/>
@@ -9055,44 +8948,44 @@ to ESC 5V Input</text>
 <instance part="SUPPLY1" gate="GND" x="-22.86" y="58.42" smashed="yes" grouprefs="BMS">
 <attribute name="VALUE" x="-24.765" y="55.245" size="1.778" layer="96"/>
 </instance>
-<instance part="P+1" gate="VCC" x="180.34" y="99.06" smashed="yes" grouprefs="ESC"/>
-<instance part="SUPPLY3" gate="GND" x="162.56" y="-10.16" smashed="yes" grouprefs="ACCELEROMETER"/>
-<instance part="SUPPLY8" gate="GND" x="195.58" y="104.14" smashed="yes" grouprefs="ESC"/>
+<instance part="P+1" gate="VCC" x="134.62" y="76.2" smashed="yes" grouprefs="ESC"/>
+<instance part="SUPPLY3" gate="GND" x="162.56" y="-7.62" smashed="yes" grouprefs="ACCELEROMETER"/>
+<instance part="SUPPLY8" gate="GND" x="144.78" y="76.2" smashed="yes" grouprefs="ESC"/>
 <instance part="P+2" gate="VCC" x="-50.8" y="78.74" smashed="yes" grouprefs="BMS"/>
 <instance part="SUPPLY10" gate="GND" x="-88.9" y="58.42" smashed="yes" grouprefs="BMS">
 <attribute name="VALUE" x="-90.805" y="55.245" size="1.778" layer="96"/>
 </instance>
 <instance part="P+3" gate="VCC" x="-88.9" y="88.9" smashed="yes" grouprefs="BMS"/>
-<instance part="J1" gate="1" x="205.74" y="99.06" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="99.695" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="1" x="160.02" y="76.2" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="76.835" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="2" x="205.74" y="96.52" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="97.155" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="2" x="160.02" y="73.66" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="74.295" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="3" x="205.74" y="93.98" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="94.615" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="3" x="160.02" y="71.12" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="71.755" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="4" x="205.74" y="91.44" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="92.075" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="4" x="160.02" y="68.58" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="69.215" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="5" x="205.74" y="88.9" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="89.535" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="5" x="160.02" y="66.04" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="66.675" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="6" x="205.74" y="86.36" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="86.995" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="6" x="160.02" y="63.5" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="64.135" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="7" x="205.74" y="83.82" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="84.455" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="7" x="160.02" y="60.96" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="61.595" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="J1" gate="8" x="205.74" y="81.28" smashed="yes" rot="R180" grouprefs="ESC">
-<attribute name="NAME" x="205.74" y="81.915" size="1.016" layer="95" align="center-left"/>
+<instance part="J1" gate="8" x="160.02" y="58.42" smashed="yes" rot="R180" grouprefs="ESC">
+<attribute name="NAME" x="160.02" y="59.055" size="1.016" layer="95" align="center-left"/>
 </instance>
-<instance part="U3" gate="G$1" x="149.86" y="83.82" smashed="yes" grouprefs="ESC">
-<attribute name="NAME" x="137.16" y="105.14" size="2.0828" layer="95" ratio="10" rot="SR0"/>
-<attribute name="VALUE" x="137.16" y="59.5" size="2.0828" layer="96" ratio="10" rot="SR0"/>
+<instance part="SV1" gate="1" x="129.54" y="-12.7" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="128.27" y="-25.4" size="1.778" layer="96"/>
+<attribute name="NAME" x="128.27" y="0.762" size="1.778" layer="95"/>
 </instance>
-<instance part="SUPPLY11" gate="GND" x="180.34" y="66.04" smashed="yes" grouprefs="ESC">
-<attribute name="VALUE" x="178.435" y="62.865" size="1.778" layer="96"/>
+<instance part="SUPPLY11" gate="GND" x="142.24" y="-22.86" smashed="yes" grouprefs="ACCELEROMETER">
+<attribute name="VALUE" x="140.335" y="-26.035" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -9110,15 +9003,15 @@ to ESC 5V Input</text>
 <wire x1="33.02" y1="-12.7" x2="35.56" y2="-12.7" width="0.1524" layer="91" grouprefs="ESP8266"/>
 </segment>
 <segment>
-<pinref part="U1" gate="G$1" pin="GND"/>
 <pinref part="SUPPLY6" gate="GND" pin="GND"/>
-<wire x1="111.76" y1="-12.7" x2="116.84" y2="-12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<pinref part="U1" gate="G$1" pin="RESV"/>
+<pinref part="U1" gate="G$1" pin="GND"/>
 <wire x1="111.76" y1="-10.16" x2="116.84" y2="-10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<wire x1="116.84" y1="-10.16" x2="116.84" y2="-12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<junction x="116.84" y="-12.7" grouprefs="ACCELEROMETER"/>
+<pinref part="U1" gate="G$1" pin="RESV"/>
+<wire x1="111.76" y1="-7.62" x2="116.84" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="-7.62" x2="116.84" y2="-10.16" width="0.1524" layer="91"/>
+<junction x="116.84" y="-10.16"/>
 <pinref part="C7" gate="G$1" pin="2"/>
-<junction x="116.84" y="-10.16" grouprefs="ACCELEROMETER"/>
+<junction x="116.84" y="-7.62"/>
 </segment>
 <segment>
 <pinref part="SUPPLY9" gate="GND" pin="GND"/>
@@ -9128,25 +9021,25 @@ to ESC 5V Input</text>
 <pinref part="C5" gate="G$1" pin="2"/>
 <pinref part="SUPPLY7" gate="GND" pin="GND"/>
 <pinref part="C4" gate="G$1" pin="2"/>
-<wire x1="134.62" y1="7.62" x2="139.7" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<junction x="134.62" y="7.62" grouprefs="ACCELEROMETER"/>
-<wire x1="134.62" y1="7.62" x2="129.54" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="134.62" y1="10.16" x2="139.7" y2="10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<junction x="134.62" y="10.16" grouprefs="ACCELEROMETER"/>
+<wire x1="134.62" y1="10.16" x2="129.54" y2="10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
 <pinref part="SUPPLY2" gate="GND" pin="GND"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="86.36" y1="66.04" x2="86.36" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<wire x1="86.36" y1="68.58" x2="86.36" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<wire x1="86.36" y1="73.66" x2="86.36" y2="78.74" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<junction x="86.36" y="73.66" grouprefs="USER_INTERFACE"/>
+<wire x1="116.84" y1="60.96" x2="116.84" y2="63.5" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<wire x1="116.84" y1="63.5" x2="116.84" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<wire x1="116.84" y1="68.58" x2="116.84" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<junction x="116.84" y="68.58" grouprefs="USER_INTERFACE"/>
 <pinref part="R2" gate="G$1" pin="2"/>
-<junction x="86.36" y="68.58" grouprefs="USER_INTERFACE"/>
+<junction x="116.84" y="63.5" grouprefs="USER_INTERFACE"/>
 <pinref part="R8" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <pinref part="SV2" gate="1" pin="7"/>
-<wire x1="152.4" y1="-7.62" x2="162.56" y2="-7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="154.94" y="-7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-5.08" x2="162.56" y2="-5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="154.94" y="-5.08" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 <pinref part="SUPPLY3" gate="GND" pin="GND"/>
 </segment>
 <segment>
@@ -9168,15 +9061,15 @@ to ESC 5V Input</text>
 <pinref part="R7" gate="G$1" pin="1"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="VSS"/>
-<pinref part="SUPPLY11" gate="GND" pin="GND"/>
-<wire x1="167.64" y1="68.58" x2="180.34" y2="68.58" width="0.1524" layer="91" grouprefs="ESC"/>
+<pinref part="J1" gate="1" pin="P"/>
+<wire x1="157.48" y1="76.2" x2="157.48" y2="78.74" width="0.1524" layer="91" grouprefs="ESC"/>
+<pinref part="SUPPLY8" gate="GND" pin="GND"/>
+<wire x1="157.48" y1="78.74" x2="144.78" y2="78.74" width="0.1524" layer="91" grouprefs="ESC"/>
 </segment>
 <segment>
-<pinref part="J1" gate="1" pin="P"/>
-<wire x1="203.2" y1="99.06" x2="203.2" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="SUPPLY8" gate="GND" pin="GND"/>
-<wire x1="203.2" y1="106.68" x2="195.58" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="SV1" gate="1" pin="1"/>
+<wire x1="137.16" y1="-20.32" x2="142.24" y2="-20.32" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<pinref part="SUPPLY11" gate="GND" pin="GND"/>
 </segment>
 </net>
 <net name="5V" class="3">
@@ -9193,13 +9086,8 @@ to ESC 5V Input</text>
 <junction x="2.54" y="76.2" grouprefs="BMS"/>
 <label x="10.16" y="76.2" size="1.778" layer="95" grouprefs="BMS"/>
 </segment>
-<segment>
-<pinref part="U3" gate="G$1" pin="VDD"/>
-<wire x1="167.64" y1="99.06" x2="172.72" y2="99.06" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="170.18" y="99.06" size="1.778" layer="95" grouprefs="ESC"/>
-</segment>
 </net>
-<net name="3V3" class="3">
+<net name="3V3" class="5">
 <segment>
 <pinref part="A1" gate="G$1" pin="3V3"/>
 <wire x1="-33.02" y1="15.24" x2="-25.4" y2="15.24" width="0.1524" layer="91" grouprefs="ESP8266"/>
@@ -9212,91 +9100,86 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="VDD"/>
-<wire x1="111.76" y1="15.24" x2="129.54" y2="15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="116.84" y="15.24" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="111.76" y1="17.78" x2="129.54" y2="17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="116.84" y="17.78" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 <pinref part="C4" gate="G$1" pin="1"/>
 <pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="129.54" y1="15.24" x2="139.7" y2="15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<junction x="129.54" y="15.24" grouprefs="ACCELEROMETER"/>
+<wire x1="129.54" y1="17.78" x2="139.7" y2="17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<junction x="129.54" y="17.78" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
-<label x="116.84" y="17.78" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
-<wire x1="152.4" y1="22.86" x2="152.4" y2="17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="116.84" y="20.32" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="152.4" y1="25.4" x2="152.4" y2="20.32" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <pinref part="C6" gate="G$1" pin="1"/>
 <pinref part="U1" gate="G$1" pin="!CS"/>
-<wire x1="152.4" y1="17.78" x2="152.4" y2="15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<wire x1="81.28" y1="2.54" x2="73.66" y2="2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<wire x1="73.66" y1="2.54" x2="73.66" y2="22.86" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<wire x1="73.66" y1="22.86" x2="152.4" y2="22.86" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="152.4" y1="20.32" x2="152.4" y2="17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="81.28" y1="5.08" x2="73.66" y2="5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="73.66" y1="5.08" x2="73.66" y2="25.4" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="73.66" y1="25.4" x2="152.4" y2="25.4" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <pinref part="U1" gate="G$1" pin="VDDIO"/>
-<wire x1="111.76" y1="17.78" x2="152.4" y2="17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<junction x="152.4" y="17.78" grouprefs="ACCELEROMETER"/>
+<wire x1="111.76" y1="20.32" x2="152.4" y2="20.32" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<junction x="152.4" y="20.32" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
 <pinref part="SV2" gate="1" pin="8"/>
-<wire x1="152.4" y1="-5.08" x2="160.02" y2="-5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="154.94" y="-5.08" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-2.54" x2="160.02" y2="-2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="154.94" y="-2.54" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="VCC"/>
-<wire x1="167.64" y1="101.6" x2="172.72" y2="101.6" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="170.18" y="101.6" size="1.778" layer="95" grouprefs="ESC"/>
-</segment>
-<segment>
-<pinref part="U3" gate="G$1" pin="EN_B"/>
-<wire x1="132.08" y1="81.28" x2="106.68" y2="81.28" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="81.28" size="1.778" layer="95" grouprefs="ESC"/>
-</segment>
-<segment>
-<pinref part="U3" gate="G$1" pin="EN_C"/>
-<wire x1="132.08" y1="78.74" x2="106.68" y2="78.74" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="78.74" size="1.778" layer="95" grouprefs="ESC"/>
-</segment>
-<segment>
-<pinref part="U3" gate="G$1" pin="EN_D"/>
-<wire x1="132.08" y1="76.2" x2="106.68" y2="76.2" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="76.2" size="1.778" layer="95" grouprefs="ESC"/>
-</segment>
-<segment>
-<pinref part="U3" gate="G$1" pin="EN_A"/>
-<wire x1="132.08" y1="83.82" x2="106.68" y2="83.82" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="83.82" size="1.778" layer="95" grouprefs="ESC"/>
+<pinref part="SV1" gate="1" pin="8"/>
+<wire x1="137.16" y1="-2.54" x2="142.24" y2="-2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-2.54" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="N$1" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="REGOUT"/>
-<wire x1="111.76" y1="-5.08" x2="111.76" y2="-2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="111.76" y1="-2.54" x2="111.76" y2="0" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 <pinref part="C7" gate="G$1" pin="1"/>
-<wire x1="111.76" y1="-2.54" x2="116.84" y2="-2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="111.76" y1="0" x2="116.84" y2="0" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="INT1" class="0">
+<net name="INT1" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="INT1"/>
-<label x="116.84" y="7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
-<wire x1="121.92" y1="7.62" x2="111.76" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="116.84" y="10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="121.92" y1="10.16" x2="111.76" y2="10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="3"/>
+<wire x1="137.16" y1="-15.24" x2="142.24" y2="-15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-15.24" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="INT2" class="0">
+<net name="INT2" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="INT2"/>
-<wire x1="111.76" y1="5.08" x2="121.92" y2="5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="116.84" y="5.08" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="111.76" y1="7.62" x2="121.92" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="116.84" y="7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="2"/>
+<wire x1="137.16" y1="-17.78" x2="142.24" y2="-17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-17.78" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="FSYNC" class="0">
+<net name="FSYNC" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="FSYNC/NC"/>
-<wire x1="81.28" y1="-2.54" x2="71.12" y2="-2.54" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="71.12" y="-2.54" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="81.28" y1="0" x2="71.12" y2="0" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="71.12" y="0" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="4"/>
+<wire x1="137.16" y1="-12.7" x2="142.24" y2="-12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-12.7" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="SCL" class="2">
+<net name="SCL" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="SCL/SCLK"/>
-<wire x1="81.28" y1="7.62" x2="76.2" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="76.2" y="7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="81.28" y1="10.16" x2="76.2" y2="10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="76.2" y="10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
 <pinref part="A1" gate="G$2" pin="D1"/>
@@ -9305,15 +9188,20 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="SV2" gate="1" pin="6"/>
-<wire x1="152.4" y1="-10.16" x2="160.02" y2="-10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="154.94" y="-10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-7.62" x2="160.02" y2="-7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="154.94" y="-7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="6"/>
+<wire x1="137.16" y1="-7.62" x2="142.24" y2="-7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="SDA" class="2">
+<net name="SDA" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="SDA/SDI"/>
-<wire x1="81.28" y1="5.08" x2="76.2" y2="5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="76.2" y="5.08" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="81.28" y1="7.62" x2="76.2" y2="7.62" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="76.2" y="7.62" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 <segment>
 <pinref part="A1" gate="G$2" pin="D2"/>
@@ -9322,15 +9210,25 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="SV2" gate="1" pin="5"/>
-<wire x1="152.4" y1="-12.7" x2="160.02" y2="-12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="154.94" y="-12.7" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-10.16" x2="160.02" y2="-10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="154.94" y="-10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="5"/>
+<wire x1="137.16" y1="-10.16" x2="142.24" y2="-10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
-<net name="AD0" class="0">
+<net name="AD0" class="5">
 <segment>
 <pinref part="U1" gate="G$1" pin="AD0/SDO"/>
-<wire x1="81.28" y1="10.16" x2="76.2" y2="10.16" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="76.2" y="10.16" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="81.28" y1="12.7" x2="76.2" y2="12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="76.2" y="12.7" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+</segment>
+<segment>
+<pinref part="SV1" gate="1" pin="7"/>
+<wire x1="137.16" y1="-5.08" x2="142.24" y2="-5.08" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<label x="137.16" y="-5.08" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="PWM_MOTOR_FL" class="4">
@@ -9340,9 +9238,9 @@ to ESC 5V Input</text>
 <label x="33.02" y="5.08" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="B"/>
-<wire x1="106.68" y1="91.44" x2="132.08" y2="91.44" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="91.44" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="68.58" x2="157.48" y2="68.58" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="68.58" size="1.778" layer="95" grouprefs="ESC"/>
+<pinref part="J1" gate="4" pin="P"/>
 </segment>
 </net>
 <net name="PWM_MOTOR_FR" class="4">
@@ -9352,9 +9250,9 @@ to ESC 5V Input</text>
 <label x="33.02" y="2.54" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="A"/>
-<wire x1="106.68" y1="93.98" x2="132.08" y2="93.98" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="93.98" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="71.12" x2="157.48" y2="71.12" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="71.12" size="1.778" layer="95" grouprefs="ESC"/>
+<pinref part="J1" gate="3" pin="P"/>
 </segment>
 </net>
 <net name="PWM_MOTOR_RL" class="4">
@@ -9364,9 +9262,9 @@ to ESC 5V Input</text>
 <label x="33.02" y="-2.54" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="D"/>
-<wire x1="106.68" y1="86.36" x2="132.08" y2="86.36" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="86.36" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="63.5" x2="157.48" y2="63.5" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="63.5" size="1.778" layer="95" grouprefs="ESC"/>
+<pinref part="J1" gate="6" pin="P"/>
 </segment>
 </net>
 <net name="PWM_MOTOR_RR" class="4">
@@ -9376,9 +9274,9 @@ to ESC 5V Input</text>
 <label x="-27.94" y="5.08" size="1.778" layer="95" grouprefs="ESP8266"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="C"/>
-<wire x1="106.68" y1="88.9" x2="132.08" y2="88.9" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="106.68" y="88.9" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="66.04" x2="157.48" y2="66.04" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="66.04" size="1.778" layer="95" grouprefs="ESC"/>
+<pinref part="J1" gate="5" pin="P"/>
 </segment>
 </net>
 <net name="GPIO_LED_WIFI_CONN" class="4">
@@ -9389,8 +9287,8 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="LED5" gate="G$1" pin="A"/>
-<wire x1="63.5" y1="73.66" x2="35.56" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<label x="35.56" y="73.66" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
+<wire x1="93.98" y1="68.58" x2="66.04" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<label x="66.04" y="68.58" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
 </segment>
 </net>
 <net name="GPIO_LED_HEARTBEAT" class="4">
@@ -9401,8 +9299,8 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="LED4" gate="G$1" pin="A"/>
-<wire x1="63.5" y1="78.74" x2="35.56" y2="78.74" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<label x="35.56" y="78.74" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
+<wire x1="93.98" y1="73.66" x2="66.04" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<label x="66.04" y="73.66" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
 </segment>
 </net>
 <net name="GPIO_LED_WIFI_RX" class="4">
@@ -9413,28 +9311,28 @@ to ESC 5V Input</text>
 </segment>
 <segment>
 <pinref part="LED6" gate="G$1" pin="A"/>
-<wire x1="63.5" y1="68.58" x2="35.56" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
-<label x="35.56" y="68.58" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
+<wire x1="93.98" y1="63.5" x2="66.04" y2="63.5" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<label x="66.04" y="63.5" size="1.778" layer="95" grouprefs="USER_INTERFACE"/>
 </segment>
 </net>
 <net name="N$9" class="0">
 <segment>
 <pinref part="LED5" gate="G$1" pin="C"/>
-<wire x1="71.12" y1="73.66" x2="76.2" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<wire x1="101.6" y1="68.58" x2="106.68" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
 <pinref part="R1" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$10" class="0">
 <segment>
 <pinref part="LED4" gate="G$1" pin="C"/>
-<wire x1="71.12" y1="78.74" x2="76.2" y2="78.74" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<wire x1="101.6" y1="73.66" x2="106.68" y2="73.66" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
 <pinref part="R8" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$14" class="0">
 <segment>
 <pinref part="LED6" gate="G$1" pin="C"/>
-<wire x1="71.12" y1="68.58" x2="76.2" y2="68.58" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
+<wire x1="101.6" y1="63.5" x2="106.68" y2="63.5" width="0.1524" layer="91" grouprefs="USER_INTERFACE"/>
 <pinref part="R2" gate="G$1" pin="1"/>
 </segment>
 </net>
@@ -9456,46 +9354,45 @@ to ESC 5V Input</text>
 <net name="N$17" class="0">
 <segment>
 <pinref part="SV2" gate="1" pin="4"/>
-<wire x1="152.4" y1="-15.24" x2="160.02" y2="-15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-12.7" x2="160.02" y2="-12.7" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="N$18" class="0">
 <segment>
 <pinref part="SV2" gate="1" pin="3"/>
-<wire x1="152.4" y1="-17.78" x2="160.02" y2="-17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-15.24" x2="160.02" y2="-15.24" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="N$19" class="0">
 <segment>
 <pinref part="SV2" gate="1" pin="2"/>
-<wire x1="152.4" y1="-20.32" x2="160.02" y2="-20.32" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-17.78" x2="160.02" y2="-17.78" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="INT" class="0">
 <segment>
 <pinref part="SV2" gate="1" pin="1"/>
-<wire x1="152.4" y1="-22.86" x2="160.02" y2="-22.86" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
-<label x="154.94" y="-22.86" size="1.778" layer="95" grouprefs="ACCELEROMETER"/>
+<wire x1="154.94" y1="-20.32" x2="160.02" y2="-20.32" width="0.1524" layer="91" grouprefs="ACCELEROMETER"/>
 </segment>
 </net>
 <net name="CURR" class="0">
 <segment>
-<wire x1="180.34" y1="83.82" x2="203.2" y2="83.82" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="180.34" y="83.82" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="60.96" x2="157.48" y2="60.96" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="60.96" size="1.778" layer="95" grouprefs="ESC"/>
 <pinref part="J1" gate="7" pin="P"/>
 </segment>
 </net>
 <net name="TEL" class="0">
 <segment>
-<wire x1="180.34" y1="81.28" x2="203.2" y2="81.28" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="180.34" y="81.28" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="58.42" x2="157.48" y2="58.42" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="134.62" y="58.42" size="1.778" layer="95" grouprefs="ESC"/>
 <pinref part="J1" gate="8" pin="P"/>
 </segment>
 </net>
 <net name="VCC" class="1">
 <segment>
-<wire x1="180.34" y1="96.52" x2="203.2" y2="96.52" width="0.1524" layer="91" grouprefs="ESC"/>
-<label x="182.88" y="96.52" size="1.778" layer="95" grouprefs="ESC"/>
+<wire x1="134.62" y1="73.66" x2="157.48" y2="73.66" width="0.1524" layer="91" grouprefs="ESC"/>
+<label x="137.16" y="73.66" size="1.778" layer="95" grouprefs="ESC"/>
 <pinref part="P+1" gate="VCC" pin="VCC"/>
 <pinref part="J1" gate="2" pin="P"/>
 </segment>
@@ -9511,36 +9408,8 @@ to ESC 5V Input</text>
 <segment>
 <pinref part="P+3" gate="VCC" pin="VCC"/>
 <pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="-88.9" y1="86.36" x2="-88.9" y2="83.82" width="0.1524" layer="91"/>
-<label x="-88.9" y="83.82" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$2" class="0">
-<segment>
-<pinref part="U3" gate="G$1" pin="E"/>
-<wire x1="167.64" y1="93.98" x2="203.2" y2="93.98" width="0.1524" layer="91" grouprefs="ESC"/>
-<pinref part="J1" gate="3" pin="P"/>
-</segment>
-</net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="U3" gate="G$1" pin="F"/>
-<wire x1="167.64" y1="91.44" x2="203.2" y2="91.44" width="0.1524" layer="91" grouprefs="ESC"/>
-<pinref part="J1" gate="4" pin="P"/>
-</segment>
-</net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="U3" gate="G$1" pin="G"/>
-<wire x1="167.64" y1="88.9" x2="203.2" y2="88.9" width="0.1524" layer="91" grouprefs="ESC"/>
-<pinref part="J1" gate="5" pin="P"/>
-</segment>
-</net>
-<net name="N$11" class="0">
-<segment>
-<pinref part="U3" gate="G$1" pin="H"/>
-<pinref part="J1" gate="6" pin="P"/>
-<wire x1="167.64" y1="86.36" x2="203.2" y2="86.36" width="0.1524" layer="91" grouprefs="ESC"/>
+<wire x1="-88.9" y1="86.36" x2="-88.9" y2="83.82" width="0.1524" layer="91" grouprefs="BMS"/>
+<label x="-88.9" y="83.82" size="1.778" layer="95" grouprefs="BMS"/>
 </segment>
 </net>
 </nets>
@@ -9553,13 +9422,6 @@ to ESC 5V Input</text>
 <approved hash="202,1,-68.58,10.16,A1G$1,EN,,,,"/>
 <approved hash="202,1,-68.58,7.62,A1G$1,RST,,,,"/>
 <approved hash="104,1,-33.02,17.78,A1G$1,VIN,5V,,,"/>
-<approved hash="104,1,167.64,101.6,U3,VCC,3V3,,,"/>
-<approved hash="104,1,167.64,99.06,U3,VDD,5V,,,"/>
-<approved hash="104,1,167.64,68.58,U3,VSS,GND,,,"/>
-<approved hash="106,1,81.28,10.16,AD0,,,,,"/>
-<approved hash="106,1,203.2,83.82,CURR,,,,,"/>
-<approved hash="209,1,81.28,-2.54,FSYNC,,,,,"/>
-<approved hash="106,1,81.28,-2.54,FSYNC,,,,,"/>
 <approved hash="208,1,-30.48,-20.32,GND,sup,,,,"/>
 <approved hash="208,1,35.56,-12.7,GND,sup,,,,"/>
 <approved hash="208,1,116.84,-12.7,GND,sup,,,,"/>
@@ -9570,19 +9432,9 @@ to ESC 5V Input</text>
 <approved hash="208,1,-2.54,73.66,GND,out,,,,"/>
 <approved hash="208,1,-22.86,60.96,GND,sup,,,,"/>
 <approved hash="208,1,-88.9,60.96,GND,sup,,,,"/>
-<approved hash="208,1,180.34,68.58,GND,sup,,,,"/>
-<approved hash="208,1,195.58,106.68,GND,sup,,,,"/>
-<approved hash="106,1,152.4,-22.86,INT,,,,,"/>
-<approved hash="106,1,111.76,7.62,INT1,,,,,"/>
-<approved hash="106,1,111.76,5.08,INT2,,,,,"/>
-<approved hash="106,1,152.4,-15.24,N$17,,,,,"/>
-<approved hash="106,1,152.4,-17.78,N$18,,,,,"/>
-<approved hash="106,1,152.4,-20.32,N$19,,,,,"/>
-<approved hash="106,1,203.2,81.28,TEL,,,,,"/>
 <approved hash="113,1,67.31,77.9272,LED4,,,,,"/>
 <approved hash="113,1,67.31,72.8472,LED5,,,,,"/>
 <approved hash="113,1,67.31,67.7672,LED6,,,,,"/>
-<approved hash="113,1,149.818,-12.4104,SV2,,,,,"/>
 </errors>
 </schematic>
 </drawing>
