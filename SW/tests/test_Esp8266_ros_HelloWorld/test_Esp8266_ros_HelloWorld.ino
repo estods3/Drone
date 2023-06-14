@@ -14,6 +14,7 @@
 
 const char* ssid     = "";
 const char* password = "";
+
 // Set the rosserial socket server IP address
 IPAddress server(192,168,1,200);
 // Set the rosserial socket server port
@@ -22,10 +23,11 @@ const uint16_t serverPort = 11411;
 ros::NodeHandle nh;
 // Make a chatter publisher
 std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
+ros::Publisher chatter("NodeMCU", &str_msg);
 
 // Be polite and say hello
-char hello[13] = "hello world!";
+//char hello[13] = "hello world!";
+char hello[10] = "Node MCU!";
 
 void setup()
 {
