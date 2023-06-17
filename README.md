@@ -3,9 +3,11 @@ Drone projects including PCB design, Frame, and Software
 
 ## Design
 
-battery size
+Battery Size: 3S
 
-motors brushless or brushed
+Motors: brushless
+
+ESC: Speedybee 4-in-1 ESC
 
 drone physical size
 
