@@ -11,7 +11,6 @@
 | IMU | [Digikey](https://www.digikey.com/en/products/detail/tdk-invensense/ICM-20600/8544628) | 1 | $5.67 |
 | 8-pin header | [Digikey]() | 2 |  |
 | JST-SH 8 pin |  | 1 |  |
-| JST-SH 8 pin |  | 1 |  |
 | 5MM LED |  | 3 |  |
 | 10 Ohm Resistor |  | 3 |  |
 | 3.3k Ohm Resistor |  | 1 |  |
