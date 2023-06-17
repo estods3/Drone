@@ -12,6 +12,9 @@ drone physical size
 
 ## PCB
 single-board design with accelerometers, motor speed controllers, battery management, and LEDs.
+![image](https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png)
+![image](https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png)
+
 
 NodeMCU socket for controller with integrated wifi.
 
