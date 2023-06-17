@@ -18,7 +18,7 @@ single-board design with accelerometers, motor speed controllers, battery manage
 NodeMCU socket for controller with integrated wifi.
 
 ### PCB Features:
-Antenna spacing to prevent interference.
+Antenna clearence to prevent interference.
 
 IMU orientation aligned with drone frame.
 
