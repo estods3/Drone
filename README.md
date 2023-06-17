@@ -21,6 +21,7 @@ NodeMCU socket for controller with integrated wifi.
 Antenna spacing to prevent interference.
 
 IMU orientation aligned with drone frame.
+
 <img src="https://user-images.githubusercontent.com/13946498/227780319-d5eada6b-10d0-42fe-b5f7-ef49a47baa42.png" alt="drawing" width="400"/><img src="https://user-images.githubusercontent.com/13946498/228086294-8e9f67d7-536d-4cf0-87ef-0eea5961e807.png" alt="drawing" width="400"/>
 
 
