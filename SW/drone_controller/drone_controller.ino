@@ -32,7 +32,7 @@
 //---------------
 // Connect full battery to PCB and check displayed battery level on GUI. Adjust number below until GUI reads 100%.
 // This number reflects the bit-width of the ADC based on the voltage divider resistors used on PCB. Variation in resistor values is possible.
-#define BMS_MAX_BATTERY_BITS		    910
+#define BMS_MAX_BATTERY_BITS		    950
 
 // ESC CALIBRATION
 //-----------------
@@ -281,7 +281,7 @@ char get_commands_from_gui_client() {
   if (request.indexOf("/CMD=FL_INC") != -1) {
     c_request = 'X';
   }
-  if (request.indexOf("/CMD=FL_INIT") != -1) {
+  if (request.indexOf("/CMD=ESC_INIT") != -1) {
     c_request = 'I';
   }
 
@@ -305,7 +305,7 @@ char get_commands_from_gui_client() {
   gui_client.print("%");
   
   gui_client.println("<br><br>");
-  gui_client.println("<a href=\"/CMD=FL_INIT\"\"><button style=\"height:100px;width:400px\">ESC1 INIT</button></a><br />");
+  gui_client.println("<a href=\"/CMD=ESC_INIT\"\"><button style=\"height:100px;width:400px\">Arm ESCs</button></a><br />");
   gui_client.println("<a href=\"/CMD=UP\"\"><button style=\"height:100px;width:400px\">UP</button></a>");
   gui_client.println("<a href=\"/CMD=DOWN\"\"><button style=\"height:100px;width:400px\">DOWN</button></a><br />");
   gui_client.println("<a href=\"/CMD=LEFT\"\"><button style=\"height:100px;width:400px\">LEFT</button></a>");
@@ -527,7 +527,7 @@ void loop() {
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
   int battery_life = check_battery_life();
-  struct imu_data imu_data_set = read_imu_data(true);
+  struct imu_data imu_data_set = read_imu_data(false);
   char gui_command = get_commands_from_gui_client();
 
   /* Flight Controller:
