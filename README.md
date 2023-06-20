@@ -1,9 +1,9 @@
 # Drone
-Drone projects including PCB Design, Frame Design, and Software.
+This project is for a NodeMCU (ESP32) based DIY quadcopter that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software as well as the frame.
 
 ## Features
 
-Physical Size: 
+Physical Size: TBD
 
 Battery Size: 3S
 
@@ -16,8 +16,7 @@ For full BOM, click [here](https://github.com/estods3/Drone/blob/main/HW/BOM.md)
 ## PCB
 Single-board design with accelerometers, battery monitoring, and status LEDs.
 
-<img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png" alt="drawing" width="400"/>
-<img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png" alt="drawing" width="400"/>
+<img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png" alt="drawing" width="400"/><img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png" alt="drawing" width="400"/>
 
 ### PCB Features:
 1. 2-Layer design with top and bottom ground plane.
