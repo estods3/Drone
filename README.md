@@ -1,16 +1,17 @@
 # Drone
-Drone projects including PCB design, Frame, and Software
+Drone projects including PCB Design, Frame Design, and Software.
 
-## Design
+## Features
+
+Physical Size: 
 
 Battery Size: 3S
 
 Motors: brushless
 
-ESC: Speedybee 4-in-1 ESC
+ESC: [Speedybee 4-in-1 ESC](https://www.speedybee.com/speedybee-f7-v3-bl32-50a-4-in-1-esc/)
 
-drone physical size
-
+For full BOM, click [here](https://github.com/estods3/Drone/blob/main/HW/BOM.md)
 
 ## PCB
 single-board design with accelerometers, motor speed controllers, battery management, and LEDs.
