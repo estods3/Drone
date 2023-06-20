@@ -28,12 +28,14 @@ IMU orientation aligned with drone frame.
 
 
 ## Frame
-
+<img src="https://github.com/estods3/Drone/blob/main/BLHeliSuite32xlESC%20Setup.png" alt="drawing" width="400"/>
 
 
 
 ## Software
 Arduino-based C++ program with ROS/serial interface. Wifi controlled.
+
+### ESC Firmware with BLHeli
 
 ### ROS
 from PC run:
