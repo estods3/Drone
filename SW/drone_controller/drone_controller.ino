@@ -14,6 +14,7 @@
 #include <sensor_msgs/Range.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int16.h>
 #include <std_msgs/Char.h>
 #include <tf/transform_broadcaster.h>
 // Accelerometer Libraries if MPU6050 is used
@@ -31,27 +32,26 @@
 //---------------
 // Connect full battery to PCB and check displayed battery level on GUI. Adjust number below until GUI reads 100%.
 // This number reflects the bit-width of the ADC based on the voltage divider resistors used on PCB. Variation in resistor values is possible.
-#define BMS_MAX_BATTERY_BITS		        850
+#define BMS_MAX_BATTERY_BITS		    910
 
 // ESC CALIBRATION
 //-----------------
 // These values copied from the BlHeli configuration.
 #define ESC_MIN_THROTTLE		        1040
 #define ESC_MAX_THROTTLE		        1960
-#define ESC_REVERSE_THROTTLE	        100 // NOT USED
+#define ESC_REVERSE_THROTTLE	      100 // NOT USED
 #define ESC_ARM_SIGNAL			        1000
-#define ESC_ARM_TIME			        2000
-#define ESC_DEADZONE_RANGE              100
-#define ESC_FLUTTER_RANGE               10
+#define ESC_ARM_TIME			          2000
+#define ESC_DEADZONE_RANGE          100 // NOT USED
+#define ESC_FLUTTER_RANGE           10
 
 // PINOUT
 //-------
 int gpio_battery_level = A0;
-int pwm_motor_FL = D5;
-int pwm_motor_FR = D6;
-int pwm_motor_RL = D8;
-int pwm_motor_RR = D0; //GPIO16
-int ESC_FL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+int gpio_esc_pwm_FL = D5;
+int gpio_esc_pwm_FR = D6;
+int gpio_esc_pwm_RL = D8;
+int gpio_esc_pwm_RR = D0; //GPIO16
 //NOTE: D0 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D0 PWM Signal.
 //NOTE: D0 outputs a HIGH signal at Boot which will turn on the Motor for RR. Need to make sure VCC for motors is disconnected when booting on MCU. 
 //Potential Solution: Add RST button circuitry to PCB which triggers reset of NodeMCU + temporarily turns off motor drivers.
@@ -63,15 +63,13 @@ int gpio_led_wifi_conn = D7; // GPIO13
 //NOTE: D4 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D4 HIGH/LOW Status.
 
 // WiFI Calibration
-//------------
+//-----------------
 const char* ssid     = "";
 const char* password = "";
 int wifi_rx_flash_duration_ms = 10;
-double rcScaleValue = 1;
-Servo esc;
 
 // GUI Server
-//------------
+//-----------
 WiFiServer gui_server(80);
 
 // ROS Interface
@@ -84,19 +82,23 @@ const uint16_t ros_socket_serverPort = 11411;
 
 ros::NodeHandle drone_rosnode_handle;
 std_msgs::Bool bool_msg;
-ros::Publisher mcu_alive("MCUAlive", &bool_msg);
-ros::Publisher mcu_wifi("MCUWifi", &bool_msg);
+ros::Publisher ros_pub_mcu_alive("mcu/alive", &bool_msg);
+ros::Publisher ros_pub_mcu_wifi("mcu/wifi", &bool_msg);
 
 // Make a command publisher
 std_msgs::Char char_msg;
-ros::Publisher command("Command", &char_msg);
+ros::Publisher ros_pub_command("controller/command", &char_msg);
 String gui_command = "Hold";  //default command 
 
 sensor_msgs::Imu imu_msg;
-ros::Publisher pub_imu("imu/data_raw", &imu_msg);
+ros::Publisher ros_pub_imu("imu/data_raw", &imu_msg);
 
-//TODO - need ROS messages and topics for commanded action (from GUI) and commanded speed to each ESC from Flight Controller (ints)
-//TODO - need ROS message for battery life (float)
+std_msgs::Int16 int_msg;
+ros::Publisher ros_pub_batt_life("mcu/batterylife", &int_msg);
+ros::Publisher ros_pub_throttle_esc_FL("throttle/esc_FL", &int_msg);
+ros::Publisher ros_pub_throttle_esc_FR("throttle/esc_FR", &int_msg);
+ros::Publisher ros_pub_throttle_esc_RL("throttle/esc_RL", &int_msg);
+ros::Publisher ros_pub_throttle_esc_RR("throttle/esc_RR", &int_msg);
 
 //sensor_msgs::Range range_msg;
 //ros::Publisher pub_ran( "/range/test", &range_msg);
@@ -108,8 +110,82 @@ ros::Publisher pub_imu("imu/data_raw", &imu_msg);
 #endif
 
 // IMU
-//----------
+//----
 Adafruit_MPU6050 mpu;
+
+// ESCs
+//-----
+double rcScaleValue = 1;
+Servo esc_FL;
+Servo esc_FR;
+Servo esc_RL;
+Servo esc_RR;
+int16_t ESC_FL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+int16_t ESC_FR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+int16_t ESC_RL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+int16_t ESC_RR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+
+/*___________________________________________________________________________________________ 
+* FUNCTIONS Library
+* void connect_to_wifi()
+* bool check_wifi_status()
+* void initialize_gui_server()
+* char get_commands_from_gui_client()
+* void initialize_imu()
+* struct imu_data read_imu_data(bool log)
+* void initialize_ros_serial_socket_server_connection(IPAddress server, uint16_t port)
+* 
+* ___________________________________________________________________________________________
+*/
+
+// CLASS: Heartbeat LED
+// Description: Class to create a heartbeat LED that will not block CPU in order to update.
+class heartbeatLED {
+  // Class Member Variables
+  // These are initialized at startup
+  int ledPin;    // the number of the LED pin
+  long OnTime;   // milliseconds of on-time
+  long OffTime;  // milliseconds of off-time
+
+  // These maintain the current state
+  int ledState;                  // ledState used to set the LED
+  unsigned long previousMillis;  // will store last time LED was updated
+
+  // Constructor - creates a heartbeatLED
+  // and initializes the member variables and state
+public:
+  heartbeatLED(int pin, long on, long off) {
+    ledPin = pin;
+    pinMode(ledPin, OUTPUT);
+
+    OnTime = on;
+    OffTime = off;
+
+    ledState = LOW;
+    previousMillis = 0;
+  }
+
+  bool Update() {
+    // check to see if it's time to change the state of the LED
+    // update LED, return state of LED
+    unsigned long currentMillis = millis();
+
+    if ((ledState == HIGH) && (currentMillis - previousMillis >= OnTime)) {
+      ledState = LOW;                  // Turn it off
+      previousMillis = currentMillis;  // Remember the time
+      digitalWrite(ledPin, ledState);  // Update the actual LED
+    } else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime)) {
+      ledState = HIGH;                 // turn it on
+      previousMillis = currentMillis;  // Remember the time
+      digitalWrite(ledPin, ledState);  // Update the actual LED
+    }
+
+    return ledState == HIGH;    
+  }
+};
+
+// Instantiate Global Variables from Above.
+heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
 
 // FUNCTION: Connect to Wifi
 // Description: initialize connection to specified wifi network
@@ -330,15 +406,29 @@ int ScaleRCInput(int rcValue)
     return ((rcValue - 1000) * rcScaleValue) + ESC_MIN_THROTTLE;
 }
 
-void InitESC()
+// FUNCTION Init ESC
+// Description: Initialize using the arming sequence.
+void InitESCs()
 {
-    esc.writeMicroseconds(ESC_ARM_SIGNAL);
+    Serial.println("Arming ESCs...");
+    esc_FL.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_FR.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_RL.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_RR.writeMicroseconds(ESC_ARM_SIGNAL);
     unsigned long now = millis();
     while (millis() < now + ESC_ARM_TIME)
-    {
-        esc.writeMicroseconds(ESC_MAX_THROTTLE);      
+    { 
+      esc_FL.writeMicroseconds(ESC_MAX_THROTTLE);
+      esc_FR.writeMicroseconds(ESC_MAX_THROTTLE);
+      esc_RL.writeMicroseconds(ESC_MAX_THROTTLE);
+      esc_RR.writeMicroseconds(ESC_MAX_THROTTLE);
+      heartbeat.Update(); //Always update heartbeat LED inside while loops
     }
-    esc.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_FL.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_FR.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_RL.writeMicroseconds(ESC_ARM_SIGNAL);
+    esc_RR.writeMicroseconds(ESC_ARM_SIGNAL);
+    Serial.println("Arming Done");
 }
 
 bool isDeadzone(int speed)
@@ -350,73 +440,30 @@ bool isDeadzone(int speed)
     return false;
 }
 
-void WriteSpeed(int speed)
+void WriteSpeed(Servo &esc_obj, int speed)
 {
     if (isDeadzone(speed)) speed == ESC_REVERSE_THROTTLE;
 
-    int curSpeed = esc.readMicroseconds();
+    int curSpeed = esc_obj.readMicroseconds();
 
     if (curSpeed >= (speed - ESC_FLUTTER_RANGE) && curSpeed <= (speed + ESC_FLUTTER_RANGE))
     {
         return;
     }
 
-    esc.writeMicroseconds(speed);
+    esc_obj.writeMicroseconds(speed);
 }
 
-
-// CLASS: Heartbeat LED
-// Description: Class to create a heartbeat LED that will not block CPU in order to update.
-class heartbeatLED {
-  // Class Member Variables
-  // These are initialized at startup
-  int ledPin;    // the number of the LED pin
-  long OnTime;   // milliseconds of on-time
-  long OffTime;  // milliseconds of off-time
-
-  // These maintain the current state
-  int ledState;                  // ledState used to set the LED
-  unsigned long previousMillis;  // will store last time LED was updated
-
-  // Constructor - creates a heartbeatLED
-  // and initializes the member variables and state
-public:
-  heartbeatLED(int pin, long on, long off) {
-    ledPin = pin;
-    pinMode(ledPin, OUTPUT);
-
-    OnTime = on;
-    OffTime = off;
-
-    ledState = LOW;
-    previousMillis = 0;
-  }
-
-  bool Update() {
-    // check to see if it's time to change the state of the LED
-    // update LED, return state of LED
-    unsigned long currentMillis = millis();
-
-    if ((ledState == HIGH) && (currentMillis - previousMillis >= OnTime)) {
-      ledState = LOW;                  // Turn it off
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
-    } else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime)) {
-      ledState = HIGH;                 // turn it on
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
-    }
-
-    return ledState == HIGH;    
-  }
-};
-
-// Instantiate Global Variables from Above.
-heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
-
-/* SETUP
-*
-*
+/*___________________________________________________________________________________________ 
+* Setup
+* 1. Initialize serial debug interface
+* 2. Setup GPIO Pins
+* 3. Initialize ESCs
+* 4. Connect to Wifi
+* 5. Create GUI Server
+* 6. Initialize IMU
+* 7. Advertise ROS Messages (if ROS is used)
+* ___________________________________________________________________________________________
 */
 void setup() {
   // Initialize serial debug interface @115200 Baud
@@ -432,7 +479,10 @@ void setup() {
   heartbeat.Update();
 
   // Initialize ESCs
-  esc.attach(pwm_motor_FL, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
+  esc_FL.attach(gpio_esc_pwm_FL, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
+  esc_FR.attach(gpio_esc_pwm_FR, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
+  esc_RL.attach(gpio_esc_pwm_RL, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
+  esc_RR.attach(gpio_esc_pwm_RR, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
   rcScaleValue = DetermineRCScale();
 
   // Connect the ESP8266 the the wifi AP
@@ -448,10 +498,15 @@ void setup() {
   // Set the connection to rosserial socket server and start advertising messages
   if(ros_is_used){  
     initialize_ros_serial_socket_server_connection(ros_socket_server, ros_socket_serverPort);
-    drone_rosnode_handle.advertise(mcu_alive);
-    drone_rosnode_handle.advertise(mcu_wifi);
-    drone_rosnode_handle.advertise(command);
-    drone_rosnode_handle.advertise(pub_imu);
+    drone_rosnode_handle.advertise(ros_pub_mcu_alive);
+    drone_rosnode_handle.advertise(ros_pub_mcu_wifi);
+    drone_rosnode_handle.advertise(ros_pub_batt_life);
+    drone_rosnode_handle.advertise(ros_pub_command);
+    drone_rosnode_handle.advertise(ros_pub_imu);
+    drone_rosnode_handle.advertise(ros_pub_throttle_esc_FL);
+    drone_rosnode_handle.advertise(ros_pub_throttle_esc_FR);
+    drone_rosnode_handle.advertise(ros_pub_throttle_esc_RL);
+    drone_rosnode_handle.advertise(ros_pub_throttle_esc_RR);
   }
 }
 
@@ -459,8 +514,8 @@ void setup() {
 /*___________________________________________________________________________________________ 
 * Main Loop
 * 1. Update Status Variables: Heartbeat Signal, Wifi Status, Battery Life, IMU, User Command.
-* 2. Update ROS Network: If ROS is Used, publish messages with data.
-* 3. Flight Controller: Control drone ESCs/Motors using information from Status above.
+* 2. Flight Controller: Control drone ESCs/Motors using information from Status above.
+* 3. Update ROS Network: If ROS is Used, publish messages with data.
 * ___________________________________________________________________________________________
 */
 void loop() {
@@ -472,31 +527,65 @@ void loop() {
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
   int battery_life = check_battery_life();
-  struct imu_data imu_data_set = read_imu_data(false);
+  struct imu_data imu_data_set = read_imu_data(true);
   char gui_command = get_commands_from_gui_client();
+
+  /* Flight Controller:
+  *  ------------------
+  *  Perform Flight Control using inputs  
+  *
+  */
+  //flight_controller();
+  if(gui_command == 'I'){
+    InitESCs();
+  }
+  if(TESTING_MODE){
+    if(gui_command == 'Z') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE - ESC_FLUTTER_RANGE;
+    if(gui_command == 'X') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE + ESC_FLUTTER_RANGE;
+    //Serial.print("Recieved: " );
+    //Serial.println(ESC_FL_CURRENT_INPUT_VALUE);
+    int valueSpeed = ScaleRCInput(ESC_FL_CURRENT_INPUT_VALUE);
+    WriteSpeed(esc_FL, valueSpeed);
+    delay(20);
+  }
 
   /* Update ROS Network:
   *  -----------------
-  *  Publish Data from various sources such as: heartbeat, wifi status, IMU, GUI
+  *  Publish Data from various sources such as: heartbeat, wifi status, battery life, IMU, GUI
   *  to ROS Network
   */  
   if(ros_is_used) {
     if(drone_rosnode_handle.connected()) {
+
+      // Publish Heartbeat, Wifi, Battery Life, and Remote Controller
       bool_msg.data = heartbeat_signal;
-      mcu_alive.publish(&bool_msg);
+      ros_pub_mcu_alive.publish(&bool_msg);
 
       bool_msg.data = wifi_connected;
-      mcu_wifi.publish(&bool_msg);
+      ros_pub_mcu_wifi.publish(&bool_msg);
+
+      int_msg.data = battery_life;
+      ros_pub_batt_life.publish(&int_msg);
 
       char_msg.data = gui_command;
-      command.publish(&char_msg);
+      ros_pub_command.publish(&char_msg);
+
+      // Read each ESC Throttle Value and Publish to ROS Network
+      int_msg.data = esc_FL.readMicroseconds();
+      ros_pub_throttle_esc_FL.publish(&int_msg);
+      int_msg.data = esc_FR.readMicroseconds();
+      ros_pub_throttle_esc_FR.publish(&int_msg);
+      int_msg.data = esc_RL.readMicroseconds();
+      ros_pub_throttle_esc_RL.publish(&int_msg);
+      int_msg.data = esc_RR.readMicroseconds();
+      ros_pub_throttle_esc_RR.publish(&int_msg);
 
       double time_in_seconds = drone_rosnode_handle.now().toSec();
       //Serial.print(time_in_seconds);
       //if(abs(time_in_seconds - (int)time_in_seconds) < 0.01){
-      Serial.print("IMU Update to ROS: ");
-      Serial.print(time_in_seconds);
-      Serial.println();
+      //Serial.print("IMU Update to ROS: ");
+      //Serial.print(time_in_seconds);
+      //Serial.println();
       imu_msg.header.frame_id = "/imu_link";
       imu_msg.header.stamp = drone_rosnode_handle.now();
       imu_msg.angular_velocity.x = imu_data_set.g.gyro.x;
@@ -505,30 +594,11 @@ void loop() {
       imu_msg.linear_acceleration.x = imu_data_set.a.acceleration.x;
       imu_msg.linear_acceleration.y = imu_data_set.a.acceleration.y;
       imu_msg.linear_acceleration.z = imu_data_set.a.acceleration.z;
-      pub_imu.publish(&imu_msg);
-      //}
+      ros_pub_imu.publish(&imu_msg);
+      //}            
     }
     drone_rosnode_handle.spinOnce();
   }
-  
-  /* Flight Controller:
-  *  ------------------
-  *  Perform Flight Control using inputs  
-  *
-  */
-  //flight_controller();
-  if(gui_command == 'I') InitESC();
-  
-  if(TESTING_MODE){
-    if(gui_command == 'Z') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE - 5;
-    if(gui_command == 'X') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE + 5;
-    Serial.print("Recieved: " );
-    Serial.println(ESC_FL_CURRENT_INPUT_VALUE);
-    int valueSpeed = ScaleRCInput(ESC_FL_CURRENT_INPUT_VALUE);
-    WriteSpeed(valueSpeed);
-    delay(20);
-  }
-
 
   // Loop
   delay(1);
