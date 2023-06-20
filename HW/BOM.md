@@ -1,6 +1,13 @@
 # Bill of Materials
 
 
+## Powertrain Parts
+| Name | Link | Quantity | Part Cost |
+| :--- | :--- | :--- | :---- |
+| 4-in-1 ESC |  | 1 |  |
+| 3S LiPo Battery |  | 1 |  |
+| Motors | | 4 | |
+| Propellers | | 4 | |
 
 ## PCB Parts
 
@@ -25,9 +32,4 @@
 
 | Name | Link | Quantity | Part Cost |
 | :--- | :--- | :--- | :---- |
-
-Frame
-Motors
-Battery
-Propellers
 
