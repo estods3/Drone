@@ -66,7 +66,8 @@ In another terminal launch:
 rosrun imu_complementary_filter complementary_filter_node
 ```
 
-## User Interface
+## User Interface/Remote Control
+deployed over Wifi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
 
 Commands available:
 
