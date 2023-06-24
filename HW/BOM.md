@@ -17,8 +17,8 @@
 | 5V Voltage Regulator | [Digikey](https://www.digikey.com/en/products/detail/cui-inc/VXO7805-500/7350288) | 1 | $2.51 |
 | NodeMCU ESP-12E | [Amazon](https://www.amazon.com/dp/B010O1G1ES?psc=1&ref=ppx_yo2ov_dt_b_product_details) | 1 | $7.99 |
 | IMU | [Digikey](https://www.digikey.com/en/products/detail/tdk-invensense/ICM-20600/8544628) | 1 | $5.67 |
-| 8-pin header | [Digikey]() | 2 |  |
 | JST-SH 8 pin | [HobbyKing - 5 pack](https://hobbyking.com/en_us/jst-sh-8pin-socket-surface-mount-5pcs.html) | 1 | $0.72 |
+| 8-pin header |  | 2 |  |
 | 5MM LED |  | 3 |  |
 | 10 Ohm Resistor |  | 3 |  |
 | 3.3k Ohm Resistor |  | 1 |  |
