@@ -9,7 +9,7 @@
 | Motors | [Amazon - 4 pack](https://www.amazon.com/dp/B07ZCL45RR?psc=1&ref=ppx_yo2ov_dt_b_product_details) | 4 | $35.99 |
 | Propellers | | 4 | |
 
-## PCB Parts
+## Flight Controller Parts
 
 | Name | Link | Quantity | Part Cost |
 | :--- | :--- | :--- | :---- |
