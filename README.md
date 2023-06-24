@@ -1,5 +1,8 @@
 # Drone
-This project is for a NodeMCU (ESP32) based DIY quadcopter that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software as well as the frame.
+This project is for a NodeMCU (ESP32) based DIY quadcopter that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software on a 5 inch FPV frame kit.
+
+## Frame
+TBD
 
 ## Features
 
@@ -13,12 +16,12 @@ ESC: [Speedybee 4-in-1 ESC](https://www.speedybee.com/speedybee-f7-v3-bl32-50a-4
 
 For full BOM, click [here](https://github.com/estods3/Drone/blob/main/HW/BOM.md)
 
-## PCB
-Single-board design with accelerometers, battery monitoring, and status LEDs.
+## Flight Controller
+Single-board design with accelerometers, microcontroller, battery monitoring, and status LEDs.
 
 <img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png" alt="drawing" width="400"/><img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png" alt="drawing" width="400"/>
 
-### PCB Features:
+### Hardware Features:
 1. 2-Layer design with top and bottom ground plane.
 2. Antenna clearance complies with ESP32 specification to help prevent interference to WiFi Signal.
 3. IMU orientation aligned with drone frame. Design supports both ISO-20600 and MPU2060 IMU components.
@@ -26,11 +29,8 @@ Single-board design with accelerometers, battery monitoring, and status LEDs.
 4. ESC mounting holes and JST-SH 8 Pin connector layout to allow for SpeedyBee BL32 50A V3 ESC to mount directly to PCB (Stacked ESC/Flight Controller Design).
 5. Single Supply (3S LiPo) powering both 4-in-1 ESC as well as PCB.
 6. Status LEDs to quickly see if Wifi is connected, if software is recieving commands from remote controller, etc.
-   
-## Frame
-TBD
 
-## Software
+### Software
 In-house flight controller based on NodeMCU microcontroller compatible Arduino IDE.
 
 ### Software Features
