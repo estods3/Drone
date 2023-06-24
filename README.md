@@ -4,7 +4,7 @@ This project is for a NodeMCU (ESP32) based DIY quadcopter that you can control 
 ## Frame
 TBD
 
-## Design Features
+## Design Features:
 
 Physical Size: TBD
 
@@ -30,19 +30,19 @@ Single-board design with accelerometers, microcontroller, battery monitoring, an
 5. Single Supply (3S LiPo) powering both 4-in-1 ESC as well as PCB.
 6. Status LEDs to quickly see if Wifi is connected, if software is recieving commands from remote controller, etc.
 
-### Software Features
+### Software Features:
 1. Arduino-based C++.
 2. Wifi controlled using a phone with browser, provides battery life status as well as controls GUI.
-3. Robotic Operating System (ROS) serial interface provides live feed of IMU data, flight controller status, user commands, and ESC throttle to each motor. (must have variable ros_is_used = True).
+3. Robotic Operating System (ROS) interface provides live feed of IMU data, flight controller status, user commands, and ESC throttle to each motor. (must have variable ros_is_used = True).
 4. Built-in ESC Firmware debug interface with BLHeli Suite (Coming Soon).
 
-### ESC Firmware with BLHeli
+### ESC Firmware with BLHeli:
 Using Arduino Nano as an interface (4wArduino_Nano__16_MULTIv20005.hex) with ESC plugged into pin D4.
 
 <img src="https://github.com/estods3/Drone/blob/main/BLHeliSuite32xlESC%20Setup.png" alt="drawing" width="400"/>
 
 
-### ROS
+### ROS Interface:
 from PC run:
 
 ```
