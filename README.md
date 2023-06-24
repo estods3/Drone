@@ -32,9 +32,11 @@ Single-board design with accelerometers, microcontroller, battery monitoring, an
 
 ### Software Features:
 1. Arduino-based C++.
-2. Wifi controlled using a phone with browser, provides battery life status as well as controls GUI.
+2. Wifi controlled using a phone with browser, provides battery life status as well as controls for Up, Down, Left, Right, etc.
 3. Robotic Operating System (ROS) interface provides live feed of IMU data, flight controller status, user commands, and ESC throttle to each motor. (must have variable ros_is_used = True).
 4. Built-in ESC Firmware debug interface with BLHeli Suite (Coming Soon).
+5. PID-based flight stability controller (Coming Soon).
+6. "Testing Mode" allows user to test throttle of each motor, calibrate PID controller without reflashing flight controller (Coming Soon).
 
 ### ESC Firmware with BLHeli:
 Using Arduino Nano as an interface (4wArduino_Nano__16_MULTIv20005.hex) with ESC plugged into pin D4.
