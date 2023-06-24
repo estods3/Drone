@@ -4,9 +4,9 @@
 ## Powertrain Parts
 | Name | Link | Quantity | Part Cost |
 | :--- | :--- | :--- | :---- |
-| 4-in-1 ESC |  | 1 |  |
-| 3S LiPo Battery |  | 1 |  |
-| Motors | | 4 | |
+| 4-in-1 ESC | [Speedybee](https://www.speedybee.com/speedybee-f7-v3-bl32-50a-4-in-1-esc/) | 1 | $62.99 |
+| 3S LiPo Battery | [Amazon - 2 pack](https://www.amazon.com/dp/B07Y67MKQB?psc=1&ref=ppx_yo2ov_dt_b_product_details) | 1 | $30.59 |
+| Motors | [Amazon - 4 pack](https://www.amazon.com/dp/B07ZCL45RR?psc=1&ref=ppx_yo2ov_dt_b_product_details) | 4 | $35.99 |
 | Propellers | | 4 | |
 
 ## PCB Parts
@@ -32,4 +32,4 @@
 
 | Name | Link | Quantity | Part Cost |
 | :--- | :--- | :--- | :---- |
-
+| FPV Racing Drone Frame 5 inch | [Amazon](https://www.amazon.com/gp/product/B071HL5V3H/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1) | 1 | 31.99 |
