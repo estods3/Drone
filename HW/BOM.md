@@ -19,6 +19,7 @@
 | IMU1 - ISO20600 | [Digikey](https://www.digikey.com/en/products/detail/tdk-invensense/ICM-20600/8544628) | 1 | $5.67 |
 | IMU2 - MPU6050 | [Amazon](https://www.amazon.com/WWZMDiB-Module%EF%BC%883-Axis-Gyroscope-Acceleration%EF%BC%89IIC-Transmission/dp/B0BTKW7K1B?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&psc=1&smid=A1YZW40LYQY3L1) | 1 | $9.99 |
 | JST-SH 8 pin | [HobbyKing - 5 pack](https://hobbyking.com/en_us/jst-sh-8pin-socket-surface-mount-5pcs.html) | 1 | $0.72 |
+| Memory | [Digikey](https://www.digikey.com/en/products/detail/stmicroelectronics/M24C02-WMN6TP/1663568) | 1 | $0.17 |
 | 8-pin header |  | 2 |  |
 | 5MM LED |  | 3 |  |
 | 10 Ohm Resistor |  | 3 |  |
