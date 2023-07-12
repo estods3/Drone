@@ -8,6 +8,8 @@
  */
 #include <cmath>
 #include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <ros.h>
 #include <ros/time.h>
 #include <sensor_msgs/Imu.h>
@@ -70,7 +72,148 @@ int wifi_rx_flash_duration_ms = 10;
 
 // GUI Server
 //-----------
-WiFiServer gui_server(80);
+//WiFiServer gui_server(80);
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+String batterylife = "100";
+String sliderValue1 = "0";
+String sliderValue2 = "0";
+String sliderValue3 = "0";
+String sliderValue4 = "0";
+String sliderValue5 = "0";
+String sliderValue6 = "0";
+String sliderValue7 = "0";
+
+const char* PARAM_INPUT = "value";
+
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drone RC Controller</title>
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h2 {font-size: 1.5rem;}
+    p {font-size: 1rem;}
+    body {max-width: 400px; margin:0px auto; padding-bottom: 25px;}
+    .slider { -webkit-appearance: none; margin: 14px; width: 200px; height: 25px; background: #FFD65C;
+      outline: none; -webkit-transition: .2s; transition: opacity .2s;}
+    .slider::-webkit-slider-thumb {-webkit-appearance: none; appearance: none; width: 35px; height: 35px; background: #000000; cursor: pointer;}
+    .slider::-moz-range-thumb { width: 35px; height: 35px; background: #003249; cursor: pointer; }
+    .grid-container {
+      display: grid;
+      grid-template-columns: auto auto;
+      padding: 1px;
+    }
+    .grid-item {
+      padding: 10px;
+      font-size: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Drone RC Controller</h2>
+  <p>Battery Life:<span id="batterylife">%BATTERYLIFE%</span></p>
+  <div class="grid-container">
+  <div class="grid-item"><p>Lift: <span id="textSliderValue1">%SLIDER1VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="elevationSlider" min="0" max="1023" value="%SLIDER1VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><p>Forward/Backward: <span id="textSliderValue3">%SLIDER3VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="forwardSlider" min="0" max="1023" value="%SLIDER3VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><p>Yaw: <span id="textSliderValue2">%SLIDER2VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="yawSlider" min="-180" max="180" value="%SLIDER2VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><a href="/CMD=STOP"><button style="height:50px;width:100px">ESTOP</button></a><a href="/CMD=ARM"><button style="height:50px;width:100px">ARM</button></a></div>
+  </div>
+  <h3>TESTING MODE:</h3>
+  <p>ESCs</p>
+  <div class="grid-container">
+  <div class="grid-item"><p>ESC 1: <span id="textSliderValue4">%SLIDER4VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="esc1Slider" min="%ESC_MIN_THROTTLE%" max="%ESC_MAX_THROTTLE%" value="%SLIDER4VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><p>ESC 2: <span id="textSliderValue5">%SLIDER5VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="esc2Slider" min="%ESC_MIN_THROTTLE%" max="%ESC_MAX_THROTTLE%" value="%SLIDER5VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><p>ESC 3: <span id="textSliderValue6">%SLIDER6VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="esc3Slider" min="%ESC_MIN_THROTTLE%" max="%ESC_MAX_THROTTLE%" value="%SLIDER6VALUE%" step="1" class="slider"></p></div>
+  <div class="grid-item"><p>ESC 4: <span id="textSliderValue7">%SLIDER7VALUE%</span></p>
+  <p><input type="range" onchange="updateSlider(this)" id="esc4Slider" min="%ESC_MIN_THROTTLE%" max="%ESC_MAX_THROTTLE%" value="%SLIDER7VALUE%" step="1" class="slider"></p></div>
+  </div>
+<script>
+function updateSlider(element) {
+  var slider1Value = document.getElementById("elevationSlider").value;
+  document.getElementById("textSliderValue1").innerHTML = slider1Value;
+  var slider2Value = document.getElementById("yawSlider").value;
+  document.getElementById("textSliderValue2").innerHTML = slider2Value;
+  var slider3Value = document.getElementById("forwardSlider").value;
+  document.getElementById("textSliderValue3").innerHTML = slider3Value;
+  var slider4Value = document.getElementById("esc1Slider").value;
+  document.getElementById("textSliderValue4").innerHTML = slider4Value;
+  var slider5Value = document.getElementById("esc2Slider").value;
+  document.getElementById("textSliderValue5").innerHTML = slider5Value;
+  var slider6Value = document.getElementById("esc3Slider").value;
+  document.getElementById("textSliderValue6").innerHTML = slider6Value;
+  var slider7Value = document.getElementById("esc4Slider").value;
+  document.getElementById("textSliderValue7").innerHTML = slider7Value;
+  var xhr1 = new XMLHttpRequest();
+  xhr1.open("GET", "/slider1?value="+slider1Value, true);
+  xhr1.send();
+  var xhr2 = new XMLHttpRequest();
+  xhr2.open("GET", "/slider2?value="+slider2Value, true);
+  xhr2.send();
+  var xhr3 = new XMLHttpRequest();
+  xhr3.open("GET", "/slider3?value="+slider3Value, true);
+  xhr3.send();
+  var xhr4 = new XMLHttpRequest();
+  xhr4.open("GET", "/slider4?value="+slider4Value, true);
+  xhr4.send();
+  var xhr5 = new XMLHttpRequest();
+  xhr5.open("GET", "/slider5?value="+slider5Value, true);
+  xhr5.send();
+  var xhr6 = new XMLHttpRequest();
+  xhr6.open("GET", "/slider6?value="+slider6Value, true);
+  xhr6.send();
+  var xhr7 = new XMLHttpRequest();
+  xhr7.open("GET", "/slider7?value="+slider7Value, true);
+  xhr7.send();
+}
+</script>
+</body>
+</html>
+)rawliteral";
+
+// Replaces placeholder with button section in your web page
+String processor(const String& var){
+  //Serial.println(var);
+  if (var == "BATTERYLIFE"){
+    return batterylife;
+  }
+  if (var == "ESC_MIN_THROTTLE"){
+    return String(ESC_MIN_THROTTLE);
+  }
+  if (var == "ESC_MAX_THROTTLE"){
+    return String(ESC_MAX_THROTTLE);
+  }
+  if (var == "SLIDER1VALUE"){
+    return sliderValue1;
+  }
+  if (var == "SLIDER2VALUE"){
+    return sliderValue2;
+  }
+  if (var == "SLIDER3VALUE"){
+    return sliderValue3;
+  }
+  if (var == "SLIDER4VALUE"){
+    return sliderValue4;
+  }
+  if (var == "SLIDER5VALUE"){
+    return sliderValue5;
+  }
+  if (var == "SLIDER6VALUE"){
+    return sliderValue6;
+  }
+  if (var == "SLIDER7VALUE"){
+    return sliderValue7;
+  }
+  return String();
+}
 
 // ROS Interface
 //--------------
@@ -218,6 +361,7 @@ bool check_wifi_status() {
 
 // FUNCTION: Initialize GUI Server
 // Description: Create a GUI server with an http webpage for User to enter commands
+/*
 void initialize_gui_server() {
   gui_server.begin();
   Serial.println("GUI Server started");
@@ -226,6 +370,7 @@ void initialize_gui_server() {
   Serial.print(WiFi.localIP());
   Serial.println("/");
 }
+*/
 
 // FUNCTION Check Battery Life
 // Description: check battery life on pin: gpio_battery_level
@@ -237,6 +382,7 @@ int check_battery_life(){
 
 // FUNCTION: Get Commands from GUI Client
 // Description: Generate HTML Webpage. Get commands from GUI Client. 
+/*
 char get_commands_from_gui_client() {
     // Check if a client has connected
   WiFiClient gui_client = gui_server.available();
@@ -306,6 +452,7 @@ char get_commands_from_gui_client() {
   
   gui_client.println("<br><br>");
   gui_client.println("<a href=\"/CMD=ESC_INIT\"\"><button style=\"height:100px;width:400px\">Arm ESCs</button></a><br />");
+  gui_client.println("<div class=\"slidecontainer\"><input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\"></div>");
   gui_client.println("<a href=\"/CMD=UP\"\"><button style=\"height:100px;width:400px\">UP</button></a>");
   gui_client.println("<a href=\"/CMD=DOWN\"\"><button style=\"height:100px;width:400px\">DOWN</button></a><br />");
   gui_client.println("<a href=\"/CMD=LEFT\"\"><button style=\"height:100px;width:400px\">LEFT</button></a>");
@@ -322,8 +469,10 @@ char get_commands_from_gui_client() {
   Serial.println("GUI Client disconnected");
   Serial.println("");
 
+
   return c_request;
-}
+}  
+*/
 
 // FUNCTION: Initialize IMU
 // Description: initialize connection to IMU over I2C
@@ -418,16 +567,16 @@ void InitESCs()
     unsigned long now = millis();
     while (millis() < now + ESC_ARM_TIME)
     { 
-      esc_FL.writeMicroseconds(ESC_MAX_THROTTLE);
-      esc_FR.writeMicroseconds(ESC_MAX_THROTTLE);
-      esc_RL.writeMicroseconds(ESC_MAX_THROTTLE);
-      esc_RR.writeMicroseconds(ESC_MAX_THROTTLE);
+      //esc_FL.writeMicroseconds(ESC_MAX_THROTTLE);
+      //esc_FR.writeMicroseconds(ESC_MAX_THROTTLE);
+      //esc_RL.writeMicroseconds(ESC_MAX_THROTTLE);
+      //esc_RR.writeMicroseconds(ESC_MAX_THROTTLE);
       heartbeat.Update(); //Always update heartbeat LED inside while loops
     }
-    esc_FL.writeMicroseconds(ESC_ARM_SIGNAL);
-    esc_FR.writeMicroseconds(ESC_ARM_SIGNAL);
-    esc_RL.writeMicroseconds(ESC_ARM_SIGNAL);
-    esc_RR.writeMicroseconds(ESC_ARM_SIGNAL);
+    //esc_FL.writeMicroseconds(ESC_ARM_SIGNAL);
+    //esc_FR.writeMicroseconds(ESC_ARM_SIGNAL);
+    //esc_RL.writeMicroseconds(ESC_ARM_SIGNAL);
+    //esc_RR.writeMicroseconds(ESC_ARM_SIGNAL);
     Serial.println("Arming Done");
 }
 
@@ -484,12 +633,125 @@ void setup() {
   esc_RL.attach(gpio_esc_pwm_RL, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
   esc_RR.attach(gpio_esc_pwm_RR, ESC_MIN_THROTTLE, ESC_MAX_THROTTLE);
   rcScaleValue = DetermineRCScale();
+  InitESCs();
 
   // Connect the ESP8266 the the wifi AP
   connect_to_wifi();
 
   // Initialize GUI Server
-  initialize_gui_server();
+  //initialize_gui_server();
+  // Route for root / web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+
+  // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider1", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue1 = inputMessage;
+      //analogWrite(output, sliderValue.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider1 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider2", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue2 = inputMessage;
+      //analogWrite(output, sliderValue.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider2 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider3", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue3 = inputMessage;
+      //analogWrite(output, sliderValue.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider3 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider4", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue4 = inputMessage;
+      //analogWrite(output, sliderValue.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider4 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider5", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue5 = inputMessage;
+      //analogWrite(output, sliderValue.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider5 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider6", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue6 = inputMessage;
+      //analogWrite(output, sliderValue6.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider6 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+    // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
+  server.on("/slider7", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      sliderValue7 = inputMessage;
+      //analogWrite(output, sliderValue7.toInt());
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println("/slider7 = " + inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+  // Start server
+  server.begin();
 
   // Initialize IMU
   initialize_imu();
@@ -527,8 +789,9 @@ void loop() {
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
   int battery_life = check_battery_life();
+  batterylife = battery_life;
   struct imu_data imu_data_set = read_imu_data(false);
-  char gui_command = get_commands_from_gui_client();
+  //char gui_command = get_commands_from_gui_client();
 
   /* Flight Controller:
   *  ------------------
@@ -536,17 +799,24 @@ void loop() {
   *
   */
   //flight_controller();
-  if(gui_command == 'I'){
-    InitESCs();
-  }
+  //if(gui_command == 'I'){
+  //  InitESCs();
+  //}
   if(TESTING_MODE){
-    if(gui_command == 'Z') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE - ESC_FLUTTER_RANGE;
-    if(gui_command == 'X') ESC_FL_CURRENT_INPUT_VALUE = ESC_FL_CURRENT_INPUT_VALUE + ESC_FLUTTER_RANGE;
+    ESC_FL_CURRENT_INPUT_VALUE = sliderValue4.toInt();
+    ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
+    ESC_RL_CURRENT_INPUT_VALUE = sliderValue6.toInt();
+    ESC_RR_CURRENT_INPUT_VALUE = sliderValue7.toInt();
     //Serial.print("Recieved: " );
     //Serial.println(ESC_FL_CURRENT_INPUT_VALUE);
     int valueSpeed = ScaleRCInput(ESC_FL_CURRENT_INPUT_VALUE);
-    WriteSpeed(esc_FL, valueSpeed);
-    delay(20);
+    //WriteSpeed(esc_FL, valueSpeed);
+    valueSpeed = ScaleRCInput(ESC_FR_CURRENT_INPUT_VALUE);
+    //WriteSpeed(esc_FR, valueSpeed);
+    valueSpeed = ScaleRCInput(ESC_RL_CURRENT_INPUT_VALUE);
+    WriteSpeed(esc_RL, valueSpeed);
+    valueSpeed = ScaleRCInput(ESC_RR_CURRENT_INPUT_VALUE);
+    WriteSpeed(esc_RR, valueSpeed);
   }
 
   /* Update ROS Network:
@@ -567,7 +837,8 @@ void loop() {
       int_msg.data = battery_life;
       ros_pub_batt_life.publish(&int_msg);
 
-      char_msg.data = gui_command;
+      //char_msg.data = gui_command;
+      char_msg.data = 'T';
       ros_pub_command.publish(&char_msg);
 
       // Read each ESC Throttle Value and Publish to ROS Network
