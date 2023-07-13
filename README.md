@@ -41,7 +41,7 @@ Single-board design with accelerometers, microcontroller, battery monitoring, an
 ### ESC Firmware with BLHeli:
 Using Arduino Nano as an interface (4wArduino_Nano__16_MULTIv20005.hex) with ESC plugged into pin D4.
 
-<img src="https://github.com/estods3/Drone/blob/main/BLHeliSuite32xlESC%20Setup.png" alt="drawing" width="400"/>
+<img src="https://github.com/estods3/Drone/blob/main/BLHeliSuite32xlESC%20Setup.png" alt="drawing" width="1000"/>
 
 
 ### ROS Interface:
@@ -73,12 +73,12 @@ rqt
 
 to see the following visualization of your drone's data!
 
-<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="800"/>
+<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="1000"/>
 
 ## User Interface/Remote Control
 The UI for remote control is deployed over WiFi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
 
-<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" width="800"/>
+<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" width="1000"/>
 
 Commands available:
 
