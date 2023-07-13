@@ -1,25 +1,27 @@
-# Drone
-This project is for a NodeMCU (ESP32) based DIY quadcopter flight controller that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software.
+# Quadcopter ROS/Wifi Flight Controller
+This project is for a WiFi controlled quadcopter flight controller that you can control from your phone. The flight controller also interfaces with Robotic Operating System (ROS) to support live debugging and data logging. This repo provides the design files for the custom flight controller hardware and software.
 
-## Frame
-This project was tested with a 5 inch FPV Frame, although other frames could be used with tuning of the flight controller.
+### Test Frame
+This flight controller was tested with a 5 inch FPV Frame, although other frames could be used with tuning of the flight controller.
 
-## Design Features:
+### Setup:
 
-Physical Size: TBD
+Physical Size: ~450 grams, 5 inch FPV
 
-Battery Size: 3S
+Battery Size: 3S Lipo
 
-Motors: brushless
+Motors: brushless DC
 
 ESC: [Speedybee 4-in-1 ESC](https://www.speedybee.com/speedybee-f7-v3-bl32-50a-4-in-1-esc/)
 
 For full BOM, click [here](https://github.com/estods3/Drone/blob/main/HW/BOM.md)
 
 ## Flight Controller
-Single-board design with accelerometers, microcontroller, battery monitoring, and status LEDs.
+Single-board design with accelerometers, microcontroller, wifi, battery monitoring, ESC connector, and status LEDs.
 
-<img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png" alt="drawing" width="400"/><img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png" alt="drawing" width="400"/>
+| Top | Bottom |
+|---|---|
+| <img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_top.png" alt="drawing" width="400"/> | <img src="https://github.com/estods3/Drone/blob/main/HW/pcb/drone_controller_bottom.png" alt="drawing" width="400"/> |
 
 ### Hardware Features:
 1. 2-Layer design with top and bottom ground plane.
