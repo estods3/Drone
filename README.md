@@ -72,12 +72,13 @@ rqt
 ```
 
 to see the following visualization of your drone's data!
-<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="400"/>
+
+<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="800"/>
 
 ## User Interface/Remote Control
 The UI for remote control is deployed over WiFi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
 
-<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" width="400"/>
+<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" width="800"/>
 
 Commands available:
 
