@@ -1,8 +1,8 @@
 # Drone
-This project is for a NodeMCU (ESP32) based DIY quadcopter that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software on a 5 inch FPV frame kit.
+This project is for a NodeMCU (ESP32) based DIY quadcopter flight controller that you can control from your phone over WiFi. This repo provides the design files for the custom flight controller hardware and software.
 
 ## Frame
-TBD
+This project was tested with a 5 inch FPV Frame, although other frames could be used with tuning of the flight controller.
 
 ## Design Features:
 
