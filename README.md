@@ -45,13 +45,13 @@ Using Arduino Nano as an interface (4wArduino_Nano__16_MULTIv20005.hex) with ESC
 
 
 ### ROS Interface:
-from PC run:
+Irom PC run:
 
 ```
 roscore
 ```
 
-in another terminal from PC run:
+In another terminal from PC run:
 
 ```
 roslaunch rosserial_server socket.launch
@@ -66,8 +66,18 @@ In another terminal launch:
 rosrun imu_complementary_filter complementary_filter_node
 ```
 
+In another terminal launch:
+```
+rqt
+```
+
+to see the following visualization of your drone's data!
+<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="400"/>
+
 ## User Interface/Remote Control
-deployed over Wifi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
+The UI for remote control is deployed over WiFi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
+
+<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" width="400"/>
 
 Commands available:
 
