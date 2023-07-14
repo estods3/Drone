@@ -34,6 +34,26 @@ Parts list to assembly final board can be found in the BOM, [here](https://githu
 4. PID-based flight stability controller (Coming Soon).
 5. "Testing Mode" allows user to test throttle of each motor, calibrate PID controller without reflashing flight controller (Coming Soon).
 
+#### IMU Calibration:
+Run script to compute IMU calibration:
+
+```
+Loop Cnt: 4
+Results of measurements a/g:	4	-3	16388	-3	0	0
+...
+
+Calibration successful!
+Results of measurements a/g:	6	-3	16393	-3	0	2
+
+FINISHED!
+
+Sensor readings with offsets:	6	-3	16393	-3	0	2
+Your offsets:	-226	3487	1018	50	42	-14
+
+Data is printed as: acelX acelY acelZ giroX giroY giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+```
+
 #### ROS Interface:
 Irom PC run:
 
