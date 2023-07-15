@@ -55,7 +55,9 @@ Your offsets:	-0.23	-0.53	-2.29	0.03	0.02	-0.01
 ```
 
 #### ROS Interface:
-Irom PC run:
+Create a ROS interface where you can view and log data from your quadcopter live.
+
+From a PC with ROS installed, run:
 
 ```
 roscore
