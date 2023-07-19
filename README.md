@@ -3,7 +3,7 @@ This project is for a quadcopter using a WiFi controlled flight controller that 
 
 <img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/drone_during_takeoff.jpg" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" height="125"/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Control from Phone/Web, Send Commands to Drone, View data live using ROS*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Control from Phone/Web, Send Commands to Drone, View data live using ROS*
 
 This repo provides the design files for the custom flight controller hardware and software as well as a parts list for building a working quadcopter with the custom flight controller.
 
