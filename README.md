@@ -1,7 +1,7 @@
 # Quadcopter with ROS/Wifi Flight Controller
 This project is for a quadcopter using a WiFi controlled flight controller that you can control from your phone. The flight controller also interfaces with Robotic Operating System (ROS) to support live debugging and data logging with open-sourced industry tools.
 
-<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" height="200"/><img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" height="200"/>
+<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" height="200"/><img src="https://github.com/estods3/Drone/blob/main/drone_during_takeoff" alt="drawing" height="200"/><img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" height="200"/>
 
 This repo provides the design files for the custom flight controller hardware and software as well as a parts list for building a working quadcopter with the custom flight controller.
 
