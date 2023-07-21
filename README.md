@@ -124,4 +124,9 @@ Using Arduino Nano as an interface (4wArduino_Nano__16_MULTIv20005.hex) with ESC
 <img src="https://github.com/estods3/Drone/blob/main/BLHeliSuite32xlESC%20Setup.png" alt="drawing" width="1000"/>
 
 ## Resources:
-PID Controller: https://github.com/0xekez/arduino-drone-pid/blob/master/pid_v2_in_arduino/pid_v2_in_arduino.ino
+PID Controller: 
+https://github.com/0xekez/arduino-drone-pid/blob/master/pid_v2_in_arduino/pid_v2_in_arduino.ino
+https://www.youtube.com/watch?v=hGcGPUqB67Q
+https://www.youtube.com/watch?v=wkfEZmsQqiA
+https://github.com/bolandrm/rmb_multicopter
+
