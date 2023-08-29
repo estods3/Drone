@@ -78,10 +78,10 @@ String batterylife = "100";
 String sliderValue1 = "0";
 String sliderValue2 = "0";
 String sliderValue3 = "0";
-String sliderValue4 = "0";
-String sliderValue5 = "0";
-String sliderValue6 = "0";
-String sliderValue7 = "0";
+String sliderValue4 = String(ESC_MIN_THROTTLE);
+String sliderValue5 = String(ESC_MIN_THROTTLE);
+String sliderValue6 = String(ESC_MIN_THROTTLE);
+String sliderValue7 = String(ESC_MIN_THROTTLE);
 int armvalue = 0;
 int stopvalue = 0;
 
@@ -433,7 +433,9 @@ struct imu_data{
 
 // FUNCTION: Read IMU data
 // Description: Read IMU data. Log to serial for serial plotter if log= true
-struct imu_data read_imu_data(bool log){
+// FUNCTION: Read IMU data
+// Description: Read IMU data. Log to serial for serial plotter if log= true
+struct imu_data read_imu_data(bool log, float o1, float o2, float o3, float o4, float o5, float o6){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
   if(log){
@@ -461,6 +463,15 @@ struct imu_data read_imu_data(bool log){
   dataset.a = a;
   dataset.g = g;
   dataset.temp = temp;
+
+  // Apply Calibration
+  dataset.a.acceleration.x = dataset.a.acceleration.x + o1;
+  dataset.a.acceleration.y = dataset.a.acceleration.y + o2;
+  dataset.a.acceleration.z = dataset.a.acceleration.z + o3;
+  dataset.g.gyro.x = dataset.g.gyro.x + o4;
+  dataset.g.gyro.y = dataset.g.gyro.y + o5;
+  dataset.g.gyro.z = dataset.g.gyro.z + o6;
+
   return dataset;
 }
 
@@ -745,7 +756,7 @@ void loop() {
   bool wifi_connected = check_wifi_status();
   int battery_life = check_battery_life();
   batterylife = battery_life;
-  struct imu_data imu_data_set = read_imu_data(false);
+  struct imu_data imu_data_set = read_imu_data(false, -0.23, -0.53, -2.29, 0.03,	0.02, -0.01);
   //char gui_command = get_commands_from_gui_client();
 
   /* Flight Controller:
