@@ -25,7 +25,6 @@
 
 // OPERATING MODES
 //----------------
-#define ESC_TESTING_MODE  true
 #define USE_ROS false
 
 //BMS CALIBRATION
@@ -81,8 +80,9 @@ String sliderValue4 = String(ESC_MIN_THROTTLE);
 String sliderValue5 = String(ESC_MIN_THROTTLE);
 String sliderValue6 = String(ESC_MIN_THROTTLE);
 String sliderValue7 = String(ESC_MIN_THROTTLE);
-int arming_mode_requested = 0;
-int stop_mode_requested = 0;
+int armvalue = 0;
+int stopvalue = 0;
+bool TESTING_MODE = true;
 
 const char* PARAM_INPUT = "value";
 
@@ -126,22 +126,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     .collapsible {
       background-color: #32a852;
-      width: 450px;
-      color: white;
-      padding: 18px;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 15px;
-    }
-    .active, .collapsible:hover {
-      background-color: #bcf731;
-    }
-    .content {
-      padding: 0 18px;
-      display: none;
-      overflow: hidden;
-      background-color: #bcf731;
     }
   </style>
 </head>
@@ -152,7 +136,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <div class="grid-item"><p>Lift: <span id="textSliderValue1">%SLIDER1VALUE%</span></p>
   <p><input type="range" oninput="updateSlider1(this)" id="elevationSlider" min="0" max="1023" value="%SLIDER1VALUE%" step="1" class="slider"></p></div>
   <div class="grid-item"><p>Forward/Backward: <span id="textSliderValue3">%SLIDER3VALUE%</span></p>
-  <p><input type="range" oninput="updateSlider3(this)" id="forwardSlider" min="0" max="1023" value="%SLIDER3VALUE%" step="1" class="slider"></p></div>
+  <p><input type="range" oninput="updateSlider3(this)" id="forwardSlider" min="-5" max="5" value="%SLIDER3VALUE%" step="1" class="slider"></p></div>
   <div class="grid-item"><p>Yaw: <span id="textSliderValue2">%SLIDER2VALUE%</span></p>
   <p><input type="range" oninput="updateSlider2(this)" id="yawSlider" min="-180" max="180" value="%SLIDER2VALUE%" step="1" class="slider"></p></div>
   <div class="grid-item"><input type="button" id="stop_button" onclick="updateStopButton(this)" value="STOP" class="button"><input type="button"  id="arm_button" onclick="updateArmButton(this)" value="ARM" class="button"></div>  
@@ -619,8 +603,8 @@ void initialize_gui_server() {
     // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      stop_mode_requested = 1;
-      Serial.println("/stop = " + String(stop_mode_requested));
+      stopvalue = 1;
+      Serial.println("/stop = " + String(stopvalue));
       digitalWrite(gpio_led_wifi_rx, HIGH);
       delay(wifi_rx_flash_duration_ms);
       digitalWrite(gpio_led_wifi_rx, LOW);
@@ -636,8 +620,8 @@ void initialize_gui_server() {
     // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      arming_mode_requested = 1;
-      Serial.println("/arm = " + String(arming_mode_requested));
+      armvalue = 1;
+      Serial.println("/arm = " + String(armvalue));
       digitalWrite(gpio_led_wifi_rx, HIGH);
       delay(wifi_rx_flash_duration_ms);
       digitalWrite(gpio_led_wifi_rx, LOW);
@@ -839,45 +823,29 @@ void setMeasurements(float yaw_measurement, float pitch_measurement, float roll_
  * @return void
  */
 void calculateErrors() {
+    // NOTE: currently, roll measurements are very noisy
+    // consider removing from PID calculations ?
     errors[YAW]   = instruction[YAW]   - measures[YAW];
     errors[PITCH] = instruction[PITCH] - measures[PITCH];
     errors[ROLL]  = instruction[ROLL]  - measures[ROLL];
+//    Serial.print(errors[YAW]);
+//    Serial.print("\t");
+//    Serial.print(errors[PITCH]);
+//    Serial.print("\t");
+//    Serial.println(errors[ROLL]);
 }
 
 void readController(){
     if(sliderValue1.toInt() > 0){
-      started = true;
+      status = STARTED;
       instruction[THROTTLE] =sliderValue1.toInt();
     }
-
     if(sliderValue1.toInt() == 0){
       instruction[THROTTLE] = 0;          
-      started = false;
+      status = STOPPED;
     }
-
-    if(stop_mode_requested == 1){
-      started = false;
-    }
-
-    if(sliderValue3.toInt() > 0){
-      //Pitch Forward      
-      instruction[PITCH] += 0.5;
-      // TODO: need to ensure this only happens once. store last known value of SliderValue3 and only do this if() if that value changes
-    }
-
-    if(sliderValue3.toInt() < 0){
-      //Pitch Backward      
-      instruction[PITCH] -= 0.5;
-      // TODO: need to ensure this only happens once. store last known value of SliderValue3 and only do this if() if that value changes
-    }
-
-    if(sliderValue3.toInt() == 0){
-      //Pitch Backward      
-      instruction[PITCH] = 0;
-      // TODO: need to ensure this only happens once. store last known value of SliderValue3 and only do this if() if that value changes
-    }
-
     instruction[YAW] = sliderValue2.toInt();
+    instruction[PITCH] = sliderValue3.toInt();
 }
 
 /**
@@ -1040,37 +1008,31 @@ void loop() {
   *  ------------------
   */
   i++;
-  Serial.println(i/(millis()/1000-start_seconds));
-  /*
+  Serial.println(String(i/(millis()/1000-start_seconds)) + ": " + String(status));
+
   readController();
   setMeasurements(yaw_measurement, pitch_measurement, roll_measurement);
   calculateErrors();
+  bool ESC_TESTING_MODE_ACTIVATED = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
 
-  // Handle User Modes: (1) PID Controlled, Arming Mode, ESC Testing Mode, Stop Mode
-  bool at_least_one_ESC_throttle_is_active = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
 
-  if (started) {
-    pidController();
-    applyMotorSpeeds();
-  }
-  else if(!started && arming_mode_requested == 1){
+  if(armvalue == 1){
     InitESCs();
-    arming_mode_requested = 0;
+    armvalue = 0;
   }
-  else if(!started && ESC_TESTING_MODE && at_least_one_ESC_throttle_is_active){
+  if(ESC_TESTING_MODE_ACTIVATED){
     ESC_FL_CURRENT_INPUT_VALUE = sliderValue4.toInt();
-    ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
     ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
     ESC_RL_CURRENT_INPUT_VALUE = sliderValue7.toInt();
     ESC_RR_CURRENT_INPUT_VALUE = sliderValue6.toInt();
     applyMotorSpeeds();
   }
-  else if(stop_mode_requested == 1){
+  if(stopvalue == 1){
     ESC_FL_CURRENT_INPUT_VALUE = 1000;
     ESC_FR_CURRENT_INPUT_VALUE = 1000;
     ESC_RL_CURRENT_INPUT_VALUE = 1000;
     ESC_RR_CURRENT_INPUT_VALUE = 1000;
-    stop_mode_requested = 0;
+    stopvalue = 0;
     sliderValue1 = 0; //TODO - when "stop" clicked, start to gradually lower lift slider until it reaches 0.
     sliderValue2 = 0;
     sliderValue3 = 0;
@@ -1080,7 +1042,15 @@ void loop() {
     sliderValue7 = String(ESC_MIN_THROTTLE);
     stopMotors();
   }
-  */
+
+  if (status == STARTED) {
+    pidController();
+    applyMotorSpeeds();
+  }
+  else {
+    stopMotors();
+  }
+  
   /* Update ROS Network:
   *  -----------------
   *  Publish Data from various sources such as: heartbeat, wifi status, battery life, IMU, GUI
