@@ -25,7 +25,7 @@
 
 // OPERATING MODES
 //----------------
-#define TESTING_MODE  false
+#define ESC_TESTING_MODE  true
 #define USE_ROS false
 
 //BMS CALIBRATION
@@ -66,7 +66,7 @@ int gpio_led_wifi_conn = D7; // GPIO13
 //-----------------
 const char* ssid     = "";
 const char* password = "";
-int wifi_rx_flash_duration_ms = 2;
+int wifi_rx_flash_duration_ms = 4;
 
 // GUI Server
 //-----------
@@ -81,8 +81,8 @@ String sliderValue4 = String(ESC_MIN_THROTTLE);
 String sliderValue5 = String(ESC_MIN_THROTTLE);
 String sliderValue6 = String(ESC_MIN_THROTTLE);
 String sliderValue7 = String(ESC_MIN_THROTTLE);
-int armvalue = 0;
-int stopvalue = 0;
+int arming_mode_requested = 0;
+int stop_mode_requested = 0;
 
 const char* PARAM_INPUT = "value";
 
@@ -111,8 +111,37 @@ const char index_html[] PROGMEM = R"rawliteral(
       font-size: 20px;
       text-align: center;
     }
+    .PID_grid-container {
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+      background-color: #32a852;
+      padding: 10px;
+    }
+    .PID_grid-item {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 5px;
+      font-size: 20px;
+      text-align: center;
+    }
     .collapsible {
       background-color: #32a852;
+      width: 450px;
+      color: white;
+      padding: 18px;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+    }
+    .active, .collapsible:hover {
+      background-color: #bcf731;
+    }
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #bcf731;
     }
   </style>
 </head>
@@ -590,8 +619,8 @@ void initialize_gui_server() {
     // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      stopvalue = 1;
-      Serial.println("/stop = " + String(stopvalue));
+      stop_mode_requested = 1;
+      Serial.println("/stop = " + String(stop_mode_requested));
       digitalWrite(gpio_led_wifi_rx, HIGH);
       delay(wifi_rx_flash_duration_ms);
       digitalWrite(gpio_led_wifi_rx, LOW);
@@ -607,8 +636,8 @@ void initialize_gui_server() {
     // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      armvalue = 1;
-      Serial.println("/arm = " + String(armvalue));
+      arming_mode_requested = 1;
+      Serial.println("/arm = " + String(arming_mode_requested));
       digitalWrite(gpio_led_wifi_rx, HIGH);
       delay(wifi_rx_flash_duration_ms);
       digitalWrite(gpio_led_wifi_rx, LOW);
@@ -810,16 +839,9 @@ void setMeasurements(float yaw_measurement, float pitch_measurement, float roll_
  * @return void
  */
 void calculateErrors() {
-    // NOTE: currently, roll measurements are very noisy
-    // consider removing from PID calculations ?
     errors[YAW]   = instruction[YAW]   - measures[YAW];
     errors[PITCH] = instruction[PITCH] - measures[PITCH];
     errors[ROLL]  = instruction[ROLL]  - measures[ROLL];
-//    Serial.print(errors[YAW]);
-//    Serial.print("\t");
-//    Serial.print(errors[PITCH]);
-//    Serial.print("\t");
-//    Serial.println(errors[ROLL]);
 }
 
 void readController(){
@@ -833,7 +855,7 @@ void readController(){
       started = false;
     }
 
-    if(stopvalue == 1){
+    if(stop_mode_requested == 1){
       started = false;
     }
 
@@ -1019,27 +1041,36 @@ void loop() {
   */
   i++;
   Serial.println(i/(millis()/1000-start_seconds));
-
+  /*
   readController();
   setMeasurements(yaw_measurement, pitch_measurement, roll_measurement);
   calculateErrors();
 
-  if(armvalue == 1){
-    InitESCs();
-    armvalue = 0;
+  // Handle User Modes: (1) PID Controlled, Arming Mode, ESC Testing Mode, Stop Mode
+  bool at_least_one_ESC_throttle_is_active = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
+
+  if (started) {
+    pidController();
+    applyMotorSpeeds();
   }
-  if(TESTING_MODE){
+  else if(!started && arming_mode_requested == 1){
+    InitESCs();
+    arming_mode_requested = 0;
+  }
+  else if(!started && ESC_TESTING_MODE && at_least_one_ESC_throttle_is_active){
     ESC_FL_CURRENT_INPUT_VALUE = sliderValue4.toInt();
+    ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
     ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
     ESC_RL_CURRENT_INPUT_VALUE = sliderValue7.toInt();
     ESC_RR_CURRENT_INPUT_VALUE = sliderValue6.toInt();
+    applyMotorSpeeds();
   }
-  if(stopvalue == 1){
+  else if(stop_mode_requested == 1){
     ESC_FL_CURRENT_INPUT_VALUE = 1000;
     ESC_FR_CURRENT_INPUT_VALUE = 1000;
     ESC_RL_CURRENT_INPUT_VALUE = 1000;
     ESC_RR_CURRENT_INPUT_VALUE = 1000;
-    stopvalue = 0;
+    stop_mode_requested = 0;
     sliderValue1 = 0; //TODO - when "stop" clicked, start to gradually lower lift slider until it reaches 0.
     sliderValue2 = 0;
     sliderValue3 = 0;
@@ -1049,15 +1080,7 @@ void loop() {
     sliderValue7 = String(ESC_MIN_THROTTLE);
     stopMotors();
   }
-
-  if (started) {
-    pidController();
-    applyMotorSpeeds();
-  }
-  else {
-    stopMotors();
-  }
-
+  */
   /* Update ROS Network:
   *  -----------------
   *  Publish Data from various sources such as: heartbeat, wifi status, battery life, IMU, GUI
