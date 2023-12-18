@@ -25,7 +25,8 @@
 
 // OPERATING MODES
 //----------------
-#define USE_ROS false
+#define USE_ROS true
+#define ACCESS_POINT_WIFI false
 
 //BMS CALIBRATION
 //---------------
@@ -44,8 +45,21 @@
 #define ESC_DEADZONE_RANGE          100 // NOT USED
 #define ESC_FLUTTER_RANGE           10
 
+// IMU CALIBRATION
+//----------------
+// These values copied from IMU Calibration script.
+//-0.23, -0.53, -2.29, 0.03,	0.02, -0.01
+#define IMU_CAL_OFFSET1             -0.23
+#define IMU_CAL_OFFSET2             -0.53
+#define IMU_CAL_OFFSET3             -2.29
+#define IMU_CAL_OFFSET4             0.03
+#define IMU_CAL_OFFSET5             0.02
+#define IMU_CAL_OFFSET6             -0.01
+
+
 // PINOUT
 //-------
+// These values are set based on the PCB used.
 int gpio_battery_level = A0;
 int gpio_esc_pwm_FL = D5;
 int gpio_esc_pwm_FR = D6;
@@ -61,7 +75,7 @@ int gpio_led_wifi_rx = D4;
 int gpio_led_wifi_conn = D7; // GPIO13
 //NOTE: D4 is the same as the BUILT IN LED pin. The built in LED will pulse opposite D4 HIGH/LOW Status.
 
-// WiFI Calibration
+// WiFI CALIBRATION
 //-----------------
 const char* ssid     = "";
 const char* password = "";
@@ -350,7 +364,7 @@ float start_seconds {0};
 //--------------
 #ifdef USE_ROS
 // Set the rosserial socket server IP address (Same as roscore)
-IPAddress ros_socket_server(192, 168, 1, 200);
+IPAddress ros_socket_server(192, 168, 1, 100);
 // Set the rosserial socket server port (default is 11411)
 const uint16_t ros_socket_serverPort = 11411;
 
@@ -465,30 +479,36 @@ heartbeatLED heartbeat(gpio_led_heartbeat, 100, 400);
 // Description: initialize connection to specified wifi network
 void connect_to_wifi() {
   Serial.print("Connecting to WiFi: ");
-  //Serial.println(ssid);
-  WiFi.softAP("quadcopter", "qcoptlogin");
-  //WiFi.begin(ssid, password);
-  //while (WiFi.status() != WL_CONNECTED) {
-  //  delay(500);
-  //  Serial.print(".");
-  //}
+  if(ACCESS_POINT_WIFI){
+    WiFi.softAP("quadcopter", "qcoptlogin");
+  } else{
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+  }
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
-  //Serial.println(WiFi.localIP());
-  Serial.println(WiFi.softAPIP());
+  if(ACCESS_POINT_WIFI){
+    Serial.println(WiFi.softAPIP());
+  } else {
+    Serial.println(WiFi.localIP());
+  }
   check_wifi_status();
 }
 
 // FUNCTION: Check Wifi Status
 // Description: Check Wifi status, update Wifi LED accordingly.
 bool check_wifi_status() {
-  //bool wifi_status_connected = WiFi.status() == WL_CONNECTED;
-  bool wifi_status_connected = WiFi.softAPgetStationNum() >= 1;
-  if (wifi_status_connected) {
-    digitalWrite(gpio_led_wifi_conn, HIGH);
+  bool wifi_status_connected = false;
+  if(ACCESS_POINT_WIFI) {
+    wifi_status_connected = WiFi.softAPgetStationNum() >= 1;
   } else {
-    digitalWrite(gpio_led_wifi_conn, LOW);
+    wifi_status_connected = WiFi.status() == WL_CONNECTED;
   }
+  digitalWrite(gpio_led_wifi_conn, wifi_status_connected);
   return wifi_status_connected;
 }
 
@@ -672,8 +692,11 @@ void initialize_gui_server() {
   Serial.println("GUI Server started");
   Serial.print("Use this URL to connect to GUI: ");
   Serial.print("http://");
-  //Serial.print(WiFi.localIP());
-  Serial.print(WiFi.softAPIP());
+  if(ACCESS_POINT_WIFI){
+    Serial.println(WiFi.softAPIP());
+  } else {
+    Serial.println(WiFi.localIP());
+  }
   Serial.println("/");
 }
 
@@ -996,7 +1019,7 @@ void loop() {
   bool heartbeat_signal = heartbeat.Update();
   bool wifi_connected = check_wifi_status();
   int battery_life = check_battery_life();
-  struct imu_data imu_data_set = read_imu_data(false, -0.23, -0.53, -2.29, 0.03,	0.02, -0.01); // IMU Calibration Parameters. TODO - move  to top
+  struct imu_data imu_data_set = read_imu_data(false, IMU_CAL_OFFSET1, IMU_CAL_OFFSET2, IMU_CAL_OFFSET3, IMU_CAL_OFFSET4,	IMU_CAL_OFFSET5, IMU_CAL_OFFSET6);
   //char gui_command = get_commands_from_gui_client();
   //TODO - complementary filter of IMU data to construct Yaw,Pitch,Roll estimate
   //yaw_measurement, pitch_measurement, roll_measurement = complementary_filter
@@ -1008,13 +1031,12 @@ void loop() {
   *  ------------------
   */
   i++;
-  Serial.println(String(i/(millis()/1000-start_seconds)) + ": " + String(status));
-
   readController();
   setMeasurements(yaw_measurement, pitch_measurement, roll_measurement);
   calculateErrors();
   bool ESC_TESTING_MODE_ACTIVATED = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
 
+  Serial.println(String(i/(millis()/1000-start_seconds)) + "  Status: " + String(status)+ " Testing Mode: " + String(ESC_TESTING_MODE_ACTIVATED));
 
   if(armvalue == 1){
     InitESCs();
@@ -1027,12 +1049,13 @@ void loop() {
     ESC_RR_CURRENT_INPUT_VALUE = sliderValue6.toInt();
     applyMotorSpeeds();
   }
-  if(stopvalue == 1){
+  if(stopvalue == 1 || status == STOPPED){
     ESC_FL_CURRENT_INPUT_VALUE = 1000;
     ESC_FR_CURRENT_INPUT_VALUE = 1000;
     ESC_RL_CURRENT_INPUT_VALUE = 1000;
     ESC_RR_CURRENT_INPUT_VALUE = 1000;
     stopvalue = 0;
+    status = STOPPED;
     sliderValue1 = 0; //TODO - when "stop" clicked, start to gradually lower lift slider until it reaches 0.
     sliderValue2 = 0;
     sliderValue3 = 0;
@@ -1042,15 +1065,12 @@ void loop() {
     sliderValue7 = String(ESC_MIN_THROTTLE);
     stopMotors();
   }
-
   if (status == STARTED) {
     pidController();
     applyMotorSpeeds();
   }
-  else {
-    stopMotors();
-  }
-  
+  delay(2); //Control loop delay
+
   /* Update ROS Network:
   *  -----------------
   *  Publish Data from various sources such as: heartbeat, wifi status, battery life, IMU, GUI
