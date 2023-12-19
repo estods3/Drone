@@ -4,6 +4,15 @@
  * @author: estods3
  * Description:
  * This SW is the main controller for a NodeMCU-based quadcopter.
+  *
+ * (A) (B)     x
+ *   \ /     z ↑
+ *    X       \|
+ *   / \       +----→ y
+ * (C) (D)
+ *
+ * Motors A & D run clockwise.
+ * Motors B & C run counter-clockwise.
  *
  */
 #include <cmath>
@@ -25,24 +34,23 @@
 
 // OPERATING MODES
 //----------------
-#define USE_ROS true
-#define ACCESS_POINT_WIFI false
+#define USE_ROS                     true        // USE_ROS = true, will transmit all data using ROS Serial to a ROS network for remote viewing and logging
+#define ACCESS_POINT_WIFI           false       // ACCESS_POINT_WIFI = true, will create a wireless access point called "quadcopter" and allow the user to sign onto that network for RC.
 
 //BMS CALIBRATION
 //---------------
 // Connect full battery to PCB and check displayed battery level on GUI. Adjust number below until GUI reads 100%.
-// This number reflects the bit-width of the ADC based on the voltage divider resistors used on PCB. Variation in resistor values is possible.
-#define BMS_MAX_BATTERY_BITS		    950
+#define BMS_MAX_BATTERY_BITS		    950         // This number reflects the bit-width of the ADC based on the voltage divider resistors used on PCB. Variation in resistor values is possible.
 
 // ESC CALIBRATION
 //-----------------
 // These values copied from the BlHeli configuration.
 #define ESC_MIN_THROTTLE		        1040
 #define ESC_MAX_THROTTLE		        1960
-#define ESC_REVERSE_THROTTLE	      100 // NOT USED
+#define ESC_REVERSE_THROTTLE	      100         // NOT USED
 #define ESC_ARM_SIGNAL			        1000
 #define ESC_ARM_TIME			          2000
-#define ESC_DEADZONE_RANGE          100 // NOT USED
+#define ESC_DEADZONE_RANGE          100         // NOT USED
 #define ESC_FLUTTER_RANGE           10
 
 // IMU CALIBRATION
@@ -55,7 +63,6 @@
 #define IMU_CAL_OFFSET4             0.03
 #define IMU_CAL_OFFSET5             0.02
 #define IMU_CAL_OFFSET6             -0.01
-
 
 // PINOUT
 //-------
@@ -96,7 +103,6 @@ String sliderValue6 = String(ESC_MIN_THROTTLE);
 String sliderValue7 = String(ESC_MIN_THROTTLE);
 int armvalue = 0;
 int stopvalue = 0;
-bool TESTING_MODE = true;
 
 const char* PARAM_INPUT = "value";
 
@@ -272,7 +278,7 @@ function updateSlider7(element) {
 </html>
 )rawliteral";
 
-
+// FUNCTION: Processor
 // Replaces placeholder with button section in your web page
 String processor(const String& var){
   //Serial.println(var);
@@ -327,7 +333,7 @@ String processor(const String& var){
 // ---------------- Control variables ---------------------------------------
 float instruction[4] = {0,0,0,0};         // Received flight instructions in order: [Yaw (cardinal direction), Pitch (x), Roll (y), Throttle]
 
-/* TOD - Review
+/*
  * Real YPR measurements calculated from combination of accelerometer and gyro data in order: [yaw, pitch, roll]
  *  - Left side up implies positive roll
  *  - Nose up implies positive pitch
@@ -341,9 +347,9 @@ float errors[3];                          // Measured errors compared to target 
 float error_sum[3] = {0,0,0};             // Error sums used for integral component of PID in order: [yaw, pitch, roll]
 float previous_error[3] = {0,0,0};        // Previous errors used for derivative component of PID in order: [yaw, pitch, roll]
 
-float Kp[3]        = {0, 0, 0};           // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3]        = {0.00, 0.00, 0.00};  // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3]        = {0, 0, 0};           // D coefficients in that order : Yaw, Pitch, Roll
+float Kp[3]        = {1, 0, 0};           // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3]        = {1.00, 0.00, 0.00};  // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3]        = {1, 0, 0};           // D coefficients in that order : Yaw, Pitch, Roll
 
 // ---------------------------------------------------------------------------
 /**
@@ -404,14 +410,8 @@ Adafruit_MPU6050 mpu;
 // ESCs
 //-----
 double rcScaleValue = 1;
-Servo esc_FL;
-Servo esc_FR;
-Servo esc_RL;
-Servo esc_RR;
-int16_t ESC_FL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
-int16_t ESC_FR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
-int16_t ESC_RL_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
-int16_t ESC_RR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
+Servo esc_FL, esc_FR, esc_RL, esc_RR;
+int16_t ESC_FL_CURRENT_INPUT_VALUE, ESC_FR_CURRENT_INPUT_VALUE, ESC_RL_CURRENT_INPUT_VALUE, ESC_RR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
 
 /*___________________________________________________________________________________________ 
 * FUNCTIONS Library
@@ -429,47 +429,42 @@ int16_t ESC_RR_CURRENT_INPUT_VALUE = ESC_MIN_THROTTLE;
 // CLASS: Heartbeat LED
 // Description: Class to create a heartbeat LED that will not block CPU in order to update.
 class heartbeatLED {
-  // Class Member Variables
-  // These are initialized at startup
   int ledPin;    // the number of the LED pin
   long OnTime;   // milliseconds of on-time
   long OffTime;  // milliseconds of off-time
 
-  // These maintain the current state
   int ledState;                  // ledState used to set the LED
   unsigned long previousMillis;  // will store last time LED was updated
 
-  // Constructor - creates a heartbeatLED
-  // and initializes the member variables and state
-public:
-  heartbeatLED(int pin, long on, long off) {
-    ledPin = pin;
-    pinMode(ledPin, OUTPUT);
+  public:
+    heartbeatLED(int pin, long on, long off) {
+      ledPin = pin;
+      pinMode(ledPin, OUTPUT);
 
-    OnTime = on;
-    OffTime = off;
+      OnTime = on;
+      OffTime = off;
 
-    ledState = LOW;
-    previousMillis = 0;
-  }
-
-  bool Update() {
-    // check to see if it's time to change the state of the LED
-    // update LED, return state of LED
-    unsigned long currentMillis = millis();
-
-    if ((ledState == HIGH) && (currentMillis - previousMillis >= OnTime)) {
-      ledState = LOW;                  // Turn it off
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
-    } else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime)) {
-      ledState = HIGH;                 // turn it on
-      previousMillis = currentMillis;  // Remember the time
-      digitalWrite(ledPin, ledState);  // Update the actual LED
+      ledState = LOW;
+      previousMillis = 0;
     }
 
-    return ledState == HIGH;    
-  }
+    bool Update() {
+      // check to see if it's time to change the state of the LED
+      // update LED, return state of LED
+      unsigned long currentMillis = millis();
+
+      if ((ledState == HIGH) && (currentMillis - previousMillis >= OnTime)) {
+        ledState = LOW;                  // Turn it off
+        previousMillis = currentMillis;  // Remember the time
+        digitalWrite(ledPin, ledState);  // Update the actual LED
+      } else if ((ledState == LOW) && (currentMillis - previousMillis >= OffTime)) {
+        ledState = HIGH;                 // turn it on
+        previousMillis = currentMillis;  // Remember the time
+        digitalWrite(ledPin, ledState);  // Update the actual LED
+      }
+
+      return ledState == HIGH;    
+    }
 };
 
 // Instantiate Global Variables from Above.
@@ -729,11 +724,20 @@ void initialize_imu(){
   delay(100);
 }
 
-struct imu_data{
+// DATA TYPES
+struct imu_data {
   sensors_event_t a;
   sensors_event_t g;
   sensors_event_t temp;  
 };
+struct angle {
+  float x, y, z = 0;
+};
+struct Quaterniond {
+  float w, x, y, z = 0;
+};
+struct angle position;
+unsigned long lastSampleMicros = 0;
 
 // FUNCTION: Read IMU data
 // Description: Read IMU data. Log to serial for serial plotter if log= true
@@ -800,8 +804,7 @@ int ScaleRCInput(int rcValue) {
 
 // FUNCTION Init ESC
 // Description: Initialize using the arming sequence.
-void InitESCs()
-{
+void InitESCs() {
     Serial.println("Arming ESCs...");
     esc_FL.writeMicroseconds(ESC_ARM_SIGNAL);
     esc_FR.writeMicroseconds(ESC_ARM_SIGNAL);
@@ -815,8 +818,7 @@ void InitESCs()
     Serial.println("Arming Done");
 }
 
-bool isDeadzone(int speed)
-{
+bool isDeadzone(int speed) {
     if (speed >= (ESC_REVERSE_THROTTLE - ESC_DEADZONE_RANGE) && speed <= (ESC_REVERSE_THROTTLE + ESC_DEADZONE_RANGE))
     {
         return true;
@@ -824,40 +826,34 @@ bool isDeadzone(int speed)
     return false;
 }
 
-void WriteSpeed(Servo &esc_obj, int speed)
-{
-    if (isDeadzone(speed)) speed == ESC_REVERSE_THROTTLE;
-    int curSpeed = esc_obj.readMicroseconds();
-    if (curSpeed >= (speed - ESC_FLUTTER_RANGE) && curSpeed <= (speed + ESC_FLUTTER_RANGE)) {
-        return;
-    }
-    esc_obj.writeMicroseconds(speed);
+void WriteSpeed(Servo &esc_obj, int speed) {
+  if (isDeadzone(speed)) speed == ESC_REVERSE_THROTTLE;
+  int curSpeed = esc_obj.readMicroseconds();
+  if (curSpeed >= (speed - ESC_FLUTTER_RANGE) && curSpeed <= (speed + ESC_FLUTTER_RANGE)) {
+      return;
+  }
+  esc_obj.writeMicroseconds(speed);
 }
 
-void setMeasurements(float yaw_measurement, float pitch_measurement, float roll_measurement) {
-    measures[YAW] =yaw_measurement;
-    measures[PITCH] = pitch_measurement;
-    measures[ROLL] = roll_measurement;
+// FUNCTION: compute_fused_euler_angles_with_complementaryfilter
+// Description: compute a fused euler angle for yaw, pitch, and roll in degrees and store in 'measures' global variable.
+// Source: https://www.hibit.dev/posts/92/complementary-filter-and-relative-orientation-with-mpu6050
+void compute_fused_euler_angles_with_complementaryfilter(struct angle gyroscope, struct angle accelerometer) {
+  measures[YAW] = measures[YAW] + degrees(gyroscope.z);   //NOTE: Yaw is being computed only with Gyro. this is prone to drift over time.
+  measures[PITCH] = 0.98 * (measures[PITCH] + degrees(gyroscope.x)) + 0.02 * degrees(accelerometer.x);
+  measures[ROLL] = 0.98 * (measures[ROLL] + degrees(gyroscope.y)) + 0.02 * degrees(accelerometer.y);
 }
 
-/**
- * Calculate errors of Yaw, Pitch & Roll: this is simply the difference between the measure and the command.
- *
- * @return void
- */
+// FUNCTION: calculateErrors
+// Description: Calculate errors of Yaw, Pitch & Roll: this is simply the difference between the measure and the command.
 void calculateErrors() {
-    // NOTE: currently, roll measurements are very noisy
-    // consider removing from PID calculations ?
     errors[YAW]   = instruction[YAW]   - measures[YAW];
     errors[PITCH] = instruction[PITCH] - measures[PITCH];
     errors[ROLL]  = instruction[ROLL]  - measures[ROLL];
-//    Serial.print(errors[YAW]);
-//    Serial.print("\t");
-//    Serial.print(errors[PITCH]);
-//    Serial.print("\t");
-//    Serial.println(errors[ROLL]);
 }
 
+// FUNCTION: readController
+// Description: Read the remote controller inputs for throttle, forward/backward, and yaw and set 'instructions' global variable accordingly.
 void readController(){
     if(sliderValue1.toInt() > 0){
       status = STARTED;
@@ -868,7 +864,13 @@ void readController(){
       status = STOPPED;
     }
     instruction[YAW] = sliderValue2.toInt();
-    instruction[PITCH] = sliderValue3.toInt();
+    if(sliderValue3.toInt() < 0){
+      instruction[PITCH] = -2;
+    } else if(sliderValue3.toInt() > 0) {
+      instruction[PITCH] = 2;
+    } else {
+      instruction[PITCH] = 0;
+    }
 }
 
 /**
@@ -942,6 +944,51 @@ void stopMotors(){
     WriteSpeed(esc_FR, 0);
     WriteSpeed(esc_RL, 0);
     WriteSpeed(esc_RR, 0);
+}
+
+struct angle calculateAccelerometerEulerAngles(struct imu_data dataset) {
+  angle accelerometer;
+
+  accelerometer.x = atan(dataset.a.acceleration.y / sqrt(sq(dataset.a.acceleration.x) + sq(dataset.a.acceleration.z)));
+  accelerometer.y = atan(-1 * dataset.a.acceleration.x / sqrt(sq(dataset.a.acceleration.y) + sq(dataset.a.acceleration.z)));
+  accelerometer.z = atan2(accelerometer.y, accelerometer.x);
+
+  return accelerometer;
+}
+
+struct angle calculateGyroscopeEulerAngles(struct imu_data dataset, unsigned long sampleMicros) {
+  angle gyroscope;
+
+  gyroscope.x = dataset.g.gyro.x * sampleMicros / 1000000;
+  gyroscope.y = dataset.g.gyro.y * sampleMicros / 1000000;
+  gyroscope.z = dataset.g.gyro.z * sampleMicros / 1000000;
+
+  return gyroscope;
+}
+
+//FUNCTION: toQuarternion
+//desc: convert yaw, pitch, roll euler angles (in degrees) into a quarternion representation
+//Source: https://stackoverflow.com/questions/56576403/from-euler-angles-to-quaternions
+struct Quaterniond toQuaternion(double yaw, double pitch, double roll) {
+    //Degree to radius:
+    yaw = yaw * M_PI / 180;
+    pitch = pitch * M_PI / 180;
+    roll = roll * M_PI / 180;
+
+    // Abbreviations for the various angular functions
+    double cy = cos(yaw * 0.5);
+    double sy = sin(yaw * 0.5);
+    double cp = cos(pitch * 0.5);
+    double sp = sin(pitch * 0.5);
+    double cr = cos(roll * 0.5);
+    double sr = sin(roll * 0.5);
+
+    Quaterniond q;
+    q.w = cy * cp * cr + sy * sp * sr;
+    q.x = cy * cp * sr - sy * sp * cr;
+    q.y = sy * cp * sr + cy * sp * cr;
+    q.z = sy * cp * cr - cy * sp * sr;
+    return q;
 }
 
 /*___________________________________________________________________________________________ 
@@ -1021,22 +1068,22 @@ void loop() {
   int battery_life = check_battery_life();
   struct imu_data imu_data_set = read_imu_data(false, IMU_CAL_OFFSET1, IMU_CAL_OFFSET2, IMU_CAL_OFFSET3, IMU_CAL_OFFSET4,	IMU_CAL_OFFSET5, IMU_CAL_OFFSET6);
   //char gui_command = get_commands_from_gui_client();
-  //TODO - complementary filter of IMU data to construct Yaw,Pitch,Roll estimate
-  //yaw_measurement, pitch_measurement, roll_measurement = complementary_filter
-  float yaw_measurement = 0;
-  float pitch_measurement = 0;
-  float roll_measurement = 0;
+  
+  unsigned long sampleMicros = (lastSampleMicros > 0) ? micros() - lastSampleMicros : 0;
+  lastSampleMicros = micros();
+  angle accelerometer = calculateAccelerometerEulerAngles(imu_data_set);
+  angle gyroscope = calculateGyroscopeEulerAngles(imu_data_set, sampleMicros);
   
   /* Flight Controller:
   *  ------------------
   */
   i++;
   readController();
-  setMeasurements(yaw_measurement, pitch_measurement, roll_measurement);
+  compute_fused_euler_angles_with_complementaryfilter(gyroscope, accelerometer);
   calculateErrors();
   bool ESC_TESTING_MODE_ACTIVATED = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
 
-  Serial.println(String(i/(millis()/1000-start_seconds)) + "  Status: " + String(status)+ " Testing Mode: " + String(ESC_TESTING_MODE_ACTIVATED));
+  Serial.println(String(i/(millis()/1000-start_seconds)) + "  Status: " + String(status)+ " Testing Mode: " + String(ESC_TESTING_MODE_ACTIVATED) + " YPR: " + String(measures[YAW]) + ", " + String(measures[PITCH]) + ", " + String(measures[ROLL]));
 
   if(armvalue == 1){
     InitESCs();
@@ -1056,7 +1103,7 @@ void loop() {
     ESC_RR_CURRENT_INPUT_VALUE = 1000;
     stopvalue = 0;
     status = STOPPED;
-    sliderValue1 = 0; //TODO - when "stop" clicked, start to gradually lower lift slider until it reaches 0.
+    sliderValue1 = 0; //TODO - when "stop" clicked, start to gradually lower lift slider until it reaches 0., OR IF wifi connection is lost
     sliderValue2 = 0;
     sliderValue3 = 0;
     sliderValue4 = String(ESC_MIN_THROTTLE);
@@ -1069,10 +1116,10 @@ void loop() {
     pidController();
     applyMotorSpeeds();
   }
-  delay(2); //Control loop delay
+  delay(1); //Control loop delay
 
   /* Update ROS Network:
-  *  -----------------
+  *  -------------------
   *  Publish Data from various sources such as: heartbeat, wifi status, battery life, IMU, GUI
   *  to ROS Network
   */  
@@ -1109,6 +1156,11 @@ void loop() {
       double time_in_seconds = drone_rosnode_handle.now().toSec();
       imu_msg.header.frame_id = "/imu_link";
       imu_msg.header.stamp = drone_rosnode_handle.now();
+      struct Quaterniond q = toQuaternion(measures[YAW], measures[PITCH], measures[ROLL]);
+      imu_msg.orientation.x = q.x;
+      imu_msg.orientation.y = q.y;
+      imu_msg.orientation.z = q.z;
+      imu_msg.orientation.w = q.w;
       imu_msg.angular_velocity.x = imu_data_set.g.gyro.x;
       imu_msg.angular_velocity.y = imu_data_set.g.gyro.y;
       imu_msg.angular_velocity.z = imu_data_set.g.gyro.z;
