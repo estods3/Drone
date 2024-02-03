@@ -23,7 +23,7 @@ Parts list to assembly final board can be found in the BOM, [here](https://githu
 1. 2-Layer design with top and bottom ground plane.
 2. Antenna clearance complies with ESP32 specification to help prevent interference to WiFi Signal.
 3. IMU orientation aligned with drone frame. Design supports both ISO-20600 and MPU2060 IMU components.
-<img src="https://user-images.githubusercontent.com/13946498/227780319-d5eada6b-10d0-42fe-b5f7-ef49a47baa42.png" alt="drawing" width="400"/>  <img src="https://user-images.githubusercontent.com/13946498/228086294-8e9f67d7-536d-4cf0-87ef-0eea5961e807.png" alt="drawing" width="400"/>
+<img src="https://user-images.githubusercontent.com/13946498/227780319-d5eada6b-10d0-42fe-b5f7-ef49a47baa42.png" alt="drawing" width="400"/>
 4. Standard 30.5mm by 30.5mm flight controller mounting pattern
 5. Eectrical interface using JST-SH 8 Pin connector (compatible with SpeedyBee BL32 50A V3 ESC for stacked ESC/Flight Controller layout).
 6. Single Supply (3S LiPo) powering both ESC as well as flight controller (Powered through JST-SH Connector).
@@ -74,12 +74,6 @@ roslaunch rosserial_server socket.launch
 ```
 
 This will create a rosserial server to interface with the nodeMCU controller.
-
-In another terminal launch:
-
-```
-rosrun imu_complementary_filter complementary_filter_node
-```
 
 In another terminal launch:
 ```
