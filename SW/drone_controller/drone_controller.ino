@@ -34,8 +34,8 @@
 
 // OPERATING MODES
 //----------------
-#define USE_ROS                     true        // USE_ROS = true, will transmit all data using ROS Serial to a ROS network for remote viewing and logging
-#define ACCESS_POINT_WIFI           false       // ACCESS_POINT_WIFI = true, will create a wireless access point called "quadcopter" and allow the user to sign onto that network for RC.
+#define USE_ROS                     false        // USE_ROS = true, will transmit all data using ROS Serial to a ROS network for remote viewing and logging
+#define ACCESS_POINT_WIFI           true       // ACCESS_POINT_WIFI = true, will create a wireless access point called "quadcopter" and allow the user to sign onto that network for RC.
 
 //BMS CALIBRATION
 //---------------
@@ -87,6 +87,49 @@ int gpio_led_wifi_conn = D7; // GPIO13
 const char* ssid     = "";
 const char* password = "";
 int wifi_rx_flash_duration_ms = 4;
+
+// Index locations for data and instructions
+# define YAW         0
+# define PITCH       1
+# define ROLL        2
+# define THROTTLE    3
+
+# define X           0     // X axis
+# define Y           1     // Y axis
+# define Z           2     // Z axis
+
+// Status of Drone
+# define STOPPED     0
+# define ESC_TESTING 1
+# define STARTED     2
+
+// ---------------- Control variables ---------------------------------------
+float instruction[4] = {0,0,0,0};         // Received flight instructions in order: [Yaw (cardinal direction), Pitch (x), Roll (y), Throttle]
+
+/*
+ * Real YPR measurements calculated from combination of accelerometer and gyro data in order: [yaw, pitch, roll]
+ *  - Left side up implies positive roll
+ *  - Nose up implies positive pitch
+ *  - Nose right implies a positive yaw
+ */
+float measures[3] = {0,0,0};              // Real YPR measurements calculated from combination of accelerometer and gyro data in order: [yaw, pitch, roll]
+bool started = false;                     // Flag to signify if the system is started
+
+// ---------------- PID Variables ---------------------------------------
+float errors[3];                          // Measured errors compared to target positions in order: [yaw, pitch, roll]
+float error_sum[3] = {0,0,0};             // Error sums used for integral component of PID in order: [yaw, pitch, roll]
+float previous_error[3] = {0,0,0};        // Previous errors used for derivative component of PID in order: [yaw, pitch, roll]
+
+float Kp[3]        = {0, 0, 0};           // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3]        = {0.00, 0.00, 0.00};  // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3]        = {0, 0, 0};           // D coefficients in that order : Yaw, Pitch, Roll
+
+int status = STOPPED;
+// ---------------------------------------------------------------------------
+
+// for calculating running frequency of code
+float i {0};
+float start_seconds {0};
 
 // GUI Server
 //-----------
@@ -154,7 +197,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <p>Battery Life:<span id="batterylife">%BATTERYLIFE%</span></p>
   <div class="grid-container">
   <div class="grid-item"><p>Lift: <span id="textSliderValue1">%SLIDER1VALUE%</span></p>
-  <p><input type="range" oninput="updateSlider1(this)" id="elevationSlider" min="0" max="1023" value="%SLIDER1VALUE%" step="1" class="slider"></p></div>
+  <p><input type="range" oninput="updateSlider1(this)" id="elevationSlider" min="0" max="%ESC_MAX_THROTTLE%" value="%SLIDER1VALUE%" step="1" class="slider"></p></div>
   <div class="grid-item"><p>Forward/Backward: <span id="textSliderValue3">%SLIDER3VALUE%</span></p>
   <p><input type="range" oninput="updateSlider3(this)" id="forwardSlider" min="-5" max="5" value="%SLIDER3VALUE%" step="1" class="slider"></p></div>
   <div class="grid-item"><p>Yaw: <span id="textSliderValue2">%SLIDER2VALUE%</span></p>
@@ -184,17 +227,17 @@ const char index_html[] PROGMEM = R"rawliteral(
         <div class="PID_grid-item">Pitch</div>
         <div class="PID_grid-item">Roll</div>
         <div class="PID_grid-item">Kp</div>
-        <div class="PID_grid-item"><input type="text" id="Kpy" name="Kpy" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kpp" name="Kpp" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kpr" name="Kpr" value="0"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kpy" name="Kpy" value="%KPY_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kpp" name="Kpp" value="%KPP_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kpr" name="Kpr" value="%KPR_VALUE%"><br></div>
         <div class="PID_grid-item">Ki</div>
-        <div class="PID_grid-item"><input type="text" id="Kiy" name="Kiy" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kip" name="Kip" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kir" name="Kir" value="0"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kiy" name="Kiy" value="%KIY_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kip" name="Kip" value="%KIP_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kir" name="Kir" value="%KIR_VALUE%"><br></div>
         <div class="PID_grid-item">Kd</div>
-        <div class="PID_grid-item"><input type="text" id="Kdy" name="Kdy" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kdp" name="Kdp" value="0"><br></div>
-        <div class="PID_grid-item"><input type="text" id="Kdr" name="Kdr" value="0"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kdy" name="Kdy" value="%KDY_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kdp" name="Kdp" value="%KDP_VALUE%"><br></div>
+        <div class="PID_grid-item"><input type="text" id="Kdr" name="Kdr" value="%KDR_VALUE%"><br></div>
       </div>
       <input type="submit" value="Submit">
     </form>
@@ -312,59 +355,35 @@ String processor(const String& var){
   if (var == "SLIDER7VALUE"){
     return sliderValue7;
   }
+  if (var == "KPY_VALUE"){
+    return String(Kp[YAW]);
+  }
+  if (var == "KPP_VALUE"){
+    return String(Kp[PITCH]); 
+  }
+  if (var == "KPR_VALUE"){
+    return String(Kp[ROLL]); 
+  }
+  if (var == "KIY_VALUE"){
+    return String(Ki[YAW]);
+  }
+  if (var == "KIP_VALUE"){
+    return String(Ki[PITCH]); 
+  }
+  if (var == "KIR_VALUE"){
+    return String(Ki[ROLL]);
+  }
+  if (var == "KDY_VALUE"){
+    return String(Kd[YAW]);
+  }
+  if (var == "KDP_VALUE"){
+    return String(Kd[PITCH]);
+  }
+  if (var == "KDR_VALUE"){
+    return String(Kd[ROLL]);
+  }
   return String();
 }
-
-// Index locations for data and instructions
-# define YAW         0
-# define PITCH       1
-# define ROLL        2
-# define THROTTLE    3
-
-# define X           0     // X axis
-# define Y           1     // Y axis
-# define Z           2     // Z axis
-
-// Status of Drone
-# define STOPPED     0
-# define STARTING    1
-# define STARTED     2
-
-// ---------------- Control variables ---------------------------------------
-float instruction[4] = {0,0,0,0};         // Received flight instructions in order: [Yaw (cardinal direction), Pitch (x), Roll (y), Throttle]
-
-/*
- * Real YPR measurements calculated from combination of accelerometer and gyro data in order: [yaw, pitch, roll]
- *  - Left side up implies positive roll
- *  - Nose up implies positive pitch
- *  - Nose right implies a positive yaw
- */
-float measures[3] = {0,0,0};              // Real YPR measurements calculated from combination of accelerometer and gyro data in order: [yaw, pitch, roll]
-bool started = false;                     // Flag to signify if the system is started
-
-// ---------------- PID Variables ---------------------------------------
-float errors[3];                          // Measured errors compared to target positions in order: [yaw, pitch, roll]
-float error_sum[3] = {0,0,0};             // Error sums used for integral component of PID in order: [yaw, pitch, roll]
-float previous_error[3] = {0,0,0};        // Previous errors used for derivative component of PID in order: [yaw, pitch, roll]
-
-float Kp[3]        = {1, 0, 0};           // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3]        = {1.00, 0.00, 0.00};  // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3]        = {1, 0, 0};           // D coefficients in that order : Yaw, Pitch, Roll
-
-// ---------------------------------------------------------------------------
-/**
- * Status of the quadcopter:
- *   - 0 : stopped
- *   - 1 : starting
- *   - 2 : started
- * @var int
- */
-int status = STOPPED;
-// ---------------------------------------------------------------------------
-
-// for calculating running frequency of code
-float i {0};
-float start_seconds {0};
 
 // ROS Interface
 //--------------
@@ -394,13 +413,6 @@ ros::Publisher ros_pub_command_elev("controller/elevation", &int_msg);
 ros::Publisher ros_pub_command_yaw("controller/yaw", &int_msg);
 ros::Publisher ros_pub_command_forward("controller/forward", &int_msg);
 
-//sensor_msgs::Range range_msg;
-//ros::Publisher pub_ran( "/range/test", &range_msg);
-
-//geometry_msgs::TransformStamped t;
-//tf::TransformBroadcaster broadcaster;
-//char base_link[] = "/base_link";
-//char odom[] = "/odom";
 #endif
 
 // IMU
@@ -675,8 +687,8 @@ void initialize_gui_server() {
       Kd[ROLL] = request->getParam("Kdr")->value().toFloat();
     }
     Serial.println("/PID = " + String(Kp[YAW]) + "," + String(Kp[PITCH]) + "," + String(Kp[ROLL]));
-    Serial.println("/PID = " + String(Ki[YAW]) + "," + String(Kp[PITCH]) + "," + String(Kp[ROLL]));
-    Serial.println("/PID = " + String(Kd[YAW]) + "," + String(Kp[PITCH]) + "," + String(Kp[ROLL]));
+    Serial.println("/PID = " + String(Ki[YAW]) + "," + String(Ki[PITCH]) + "," + String(Ki[ROLL]));
+    Serial.println("/PID = " + String(Kd[YAW]) + "," + String(Kd[PITCH]) + "," + String(Kd[ROLL]));
     request->send(200, "text/plain", "OK");
     digitalWrite(gpio_led_wifi_rx, HIGH);
     delay(wifi_rx_flash_duration_ms);
@@ -839,7 +851,7 @@ void WriteSpeed(Servo &esc_obj, int speed) {
 // Description: compute a fused euler angle for yaw, pitch, and roll in degrees and store in 'measures' global variable.
 // Source: https://www.hibit.dev/posts/92/complementary-filter-and-relative-orientation-with-mpu6050
 void compute_fused_euler_angles_with_complementaryfilter(struct angle gyroscope, struct angle accelerometer) {
-  measures[YAW] = measures[YAW] + degrees(gyroscope.z);   //NOTE: Yaw is being computed only with Gyro. this is prone to drift over time.
+  measures[YAW] = measures[YAW] - degrees(gyroscope.z);   //NOTE: Yaw is being computed only with Gyro. this is prone to drift over time.
   measures[PITCH] = 0.98 * (measures[PITCH] + degrees(gyroscope.x)) + 0.02 * degrees(accelerometer.x);
   measures[ROLL] = 0.98 * (measures[ROLL] + degrees(gyroscope.y)) + 0.02 * degrees(accelerometer.y);
 }
@@ -876,16 +888,6 @@ void readController(){
 /**
  * Calculate motor speed for each motor of an X quadcopter depending on received instructions and measures from sensor
  * by applying PID control.
- *
- * (A) (B)     x
- *   \ /     z ↑
- *    X       \|
- *   / \       +----→ y
- * (C) (D)
- *
- * Motors A & D run clockwise.
- * Motors B & C run counter-clockwise.
- *
  * @return void
  */
 void pidController() {
@@ -1082,14 +1084,16 @@ void loop() {
   compute_fused_euler_angles_with_complementaryfilter(gyroscope, accelerometer);
   calculateErrors();
   bool ESC_TESTING_MODE_ACTIVATED = sliderValue4.toInt() > ESC_MIN_THROTTLE || sliderValue5.toInt() > ESC_MIN_THROTTLE || sliderValue6.toInt() > ESC_MIN_THROTTLE || sliderValue7.toInt() > ESC_MIN_THROTTLE;
-
-  Serial.println(String(i/(millis()/1000-start_seconds)) + "  Status: " + String(status)+ " Testing Mode: " + String(ESC_TESTING_MODE_ACTIVATED) + " YPR: " + String(measures[YAW]) + ", " + String(measures[PITCH]) + ", " + String(measures[ROLL]));
+  if(ESC_TESTING_MODE_ACTIVATED){
+    status = ESC_TESTING; 
+  }
+  Serial.println(String(i/(millis()/1000-start_seconds)) + "  Status: " + String(status) + " YPR: " + String(measures[YAW]) + ", " + String(measures[PITCH]) + ", " + String(measures[ROLL]));
 
   if(armvalue == 1){
     InitESCs();
     armvalue = 0;
   }
-  if(ESC_TESTING_MODE_ACTIVATED){
+  if(status == ESC_TESTING){
     ESC_FL_CURRENT_INPUT_VALUE = sliderValue4.toInt();
     ESC_FR_CURRENT_INPUT_VALUE = sliderValue5.toInt();
     ESC_RL_CURRENT_INPUT_VALUE = sliderValue7.toInt();
