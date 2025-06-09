@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find rosserial_server)/launch/socket.launch" >
+    </include>
+    <arg name="model" default="../../quadcopter.urdf"/>
+    <arg name="gui" default="true" />
+    <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+</launch>
