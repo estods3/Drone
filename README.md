@@ -1,7 +1,7 @@
 # Quadcopter with ROS/Wifi Flight Controller
 This project is for a quadcopter using a WiFi controlled flight controller that you can control from your phone. The flight controller also interfaces with Robotic Operating System (ROS) to support live debugging and data logging with open-sourced industry tools.
 
-<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/drone_during_takeoff.jpg" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" height="125"/>
+<img src="https://github.com/estods3/Drone/blob/main/phone_remote_controller.png" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/drone_during_takeoff.jpg" alt="drawing" height="125"/>&nbsp;&nbsp;&nbsp;<img src="https://github.com/estods3/Drone/blob/main/Docs/drone_rviz.gif" alt="drawing" height="125"/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Control from Phone/Web, Send Commands to Drone, View data live using ROS*
 
@@ -82,7 +82,7 @@ rqt
 
 to see the following visualization of your drone's data!
 
-<img src="https://github.com/estods3/Drone/blob/main/ros_live_visualization.png" alt="drawing" width="1000"/>
+<img src="https://github.com/estods3/Drone/blob/main/Docs/drone_rviz.gif" alt="drawing" width="1000"/>
 
 #### User Interface/Remote Control
 The UI for remote control is deployed over WiFi to a static IP address accessible to a phone logged on to the Flight Controller's hosted WiFi network.
